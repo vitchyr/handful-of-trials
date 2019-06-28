@@ -39,12 +39,35 @@ def main(
         cfg.exp_cfg.exp_cfg.policy = MPC(cfg.ctrl_cfg)
     exp = MBExperiment(cfg.exp_cfg)
 
-    os.makedirs(exp.logdir)
+    if os.path.exists(exp.logdir):
+        overwrite = user_prompt(
+            "{} already exists. Overwrite?".format(exp.logdir)
+        )
+        if not overwrite:
+            return
+    else:
+        os.makedirs(exp.logdir)
     with open(os.path.join(exp.logdir, "config.txt"), "w") as f:
         f.write(pprint.pformat(cfg.toDict()))
 
     exp.run_experiment()
 
+
+def user_prompt(question: str) -> bool:
+    """
+
+    Prompt the yes/no-*question* to the user.
+    https://stackoverflow.com/questions/3041986/apt-command-line-interface-like-yes-no-input
+    """
+    from distutils.util import strtobool
+
+    while True:
+        user_input = input(question + " [y/n]: ").lower()
+        try:
+            result = strtobool(user_input)
+            return result
+        except ValueError:
+            print("Please use y/n or yes/no.\n")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
