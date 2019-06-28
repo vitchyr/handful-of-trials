@@ -130,7 +130,7 @@ class MBExperiment:
 
             self.policy.dump_logs(self.logdir, iter_dir)
             savemat(
-                os.path.join(self.logdir, "logs.mat"),
+                os.path.join(iter_dir, "logs.mat"),
                 {
                     "observations": traj_obs,
                     "actions": traj_acs,
