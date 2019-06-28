@@ -24,11 +24,13 @@ def create_config(env_name, ctrl_type, ctrl_args, overrides, logdir):
             exp_cfg=DotMap(
                 ntrain_iters=int,
                 nrollouts_per_iter=int,
-                ninit_rollouts=int
+                ninit_rollouts=int,
+                init_iter=int
             ),
             log_cfg=DotMap(
                 nrecord=int,
-                neval=int
+                neval=int,
+                rawdir=make_bool,
             )
         ),
         ctrl_cfg=DotMap(

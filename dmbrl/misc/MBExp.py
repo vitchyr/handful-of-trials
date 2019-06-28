@@ -63,12 +63,19 @@ class MBExperiment:
         self.ninit_rollouts = params.exp_cfg.get("ninit_rollouts", 1)
         self.policy = get_required_argument(params.exp_cfg, "policy", "Must provide a policy.")
 
-        self.logdir = os.path.join(
-            get_required_argument(params.log_cfg, "logdir", "Must provide log parent directory."),
-            strftime("%Y-%m-%d--%H:%M:%S", localtime())
+        base_logdir = get_required_argument(
+            params.log_cfg, "logdir", "Must provide log parent directory."
         )
+        if params.log_cfg.rawdir:
+            self.logdir = base_logdir
+        else:
+            self.logdir = os.path.join(
+                base_logdir,
+                strftime("%Y-%m-%d--%H:%M:%S", localtime())
+            )
         self.nrecord = params.log_cfg.get("nrecord", 0)
         self.neval = params.log_cfg.get("neval", 1)
+        self.init_iter = params.exp_cfg.get("init_iter", 0)
 
     def run_experiment(self):
         """Perform experiment.
@@ -97,7 +104,7 @@ class MBExperiment:
             )
 
         # Training loop
-        for i in range(self.ntrain_iters):
+        for i in range(self.init_iter, self.ntrain_iters):
             print("####################################################################")
             print("Starting training iteration %d." % (i + 1))
 
