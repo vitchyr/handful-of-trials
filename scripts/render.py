@@ -69,11 +69,14 @@ def user_prompt(question: str) -> bool:
         except ValueError:
             print("Please use y/n or yes/no.\n")
 
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-env', type=str, required=True)
-    parser.add_argument('-ca', '--ctrl_arg', action='append', nargs=2, default=[])
-    parser.add_argument('-o', '--override', action='append', nargs=2, default=[])
+    parser.add_argument('-ca', '--ctrl_arg', action='append', nargs=2,
+                        default=[])
+    parser.add_argument('-o', '--override', action='append', nargs=2,
+                        default=[])
     parser.add_argument('-model-dir', type=str, required=True)
     parser.add_argument('-logdir', type=str, required=True)
     parser.add_argument('-init-iter', type=int, default=0)
@@ -83,7 +86,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     main(
-        args.env, "MPC", args.ctrl_arg, args.override, args.model_dir,
+        args.env,
+        "MPC",
+        args.ctrl_arg,
+        args.override,
+        args.model_dir,
         args.logdir,
         args.init_iter,
         args.last_iter,

@@ -16,18 +16,18 @@ register_custom_envs()
 
 
 class PointmassBaseConfigModule(object):
-    # ENV_NAME           = "PointmassUWallTestEnvBig-v1"
-    # TASK_HORIZON       = 5
-    # NTRAIN_ITERS       = 10
-    # NROLLOUTS_PER_ITER = 1
-    # PLAN_HOR           = 5
-    # MODEL_IN, MODEL_OUT = 6, 4
+    # Set these in concrete classes:
+    # TASK_HORIZON       = ?
+    # NTRAIN_ITERS       = ?
+    # NROLLOUTS_PER_ITER = ?
+    # PLAN_HOR           = ?
+    # MODEL_IN, MODEL_OUT = ?, ?
 
     def __init__(self):
         cfg = tf.ConfigProto()
         cfg.gpu_options.allow_growth = True
         self.SESS = tf.Session(config=cfg)
-        self.NN_TRAIN_CFG = {"epochs": 1}
+        self.NN_TRAIN_CFG = {"epochs": 5}
         self.OPT_CFG = {
             "Random": {
                 "popsize": 10
