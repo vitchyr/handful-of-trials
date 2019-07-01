@@ -51,6 +51,8 @@ def main(
         f.write(pprint.pformat(cfg.toDict()))
 
     exp.run_experiment()
+    print("Saved to")
+    print(exp.logdir)
 
 
 def user_prompt(question: str) -> bool:
@@ -82,7 +84,7 @@ if __name__ == "__main__":
     parser.add_argument('-init-iter', type=int, default=0)
     parser.add_argument('-last-iter', type=int, default=1)
     parser.add_argument('-nrecord', type=int, default=1)
-    parser.add_argument('-raw-dir', action='store_false')
+    parser.add_argument('-no-raw-dir', action='store_true')
     args = parser.parse_args()
 
     main(
@@ -95,5 +97,5 @@ if __name__ == "__main__":
         args.init_iter,
         args.last_iter,
         args.nrecord,
-        args.raw_dir,
+        not args.no_raw_dir,
     )

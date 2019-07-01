@@ -19,6 +19,7 @@ class PointmassReachFixedPointConfigModule(PointmassBaseConfigModule):
     NROLLOUTS_PER_ITER = 1
     PLAN_HOR = 5
     MODEL_IN, MODEL_OUT = 4, 2
+    GP_NINDUCING_POINTS = 200
 
     GOAL_NP = np.array([1, 1])
     GOAL_TF = tf.constant([1, 1], dtype=tf.float32)

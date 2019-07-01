@@ -6,8 +6,8 @@ time python scripts/render.py \
     -env $2 \
     -model-dir $1 \
     -logdir $1/renderlog \
-    -init-iter 20 \
-    -last-iter 21 \
+    -init-iter $3 \
+    -last-iter $(($3+1)) \
 
     #-o ctrl_cfg.opt_cfg.cfg.popsize 5 \
     #-o ctrl_cfg.opt_cfg.cfg.num_elites 1 \

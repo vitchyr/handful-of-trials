@@ -24,7 +24,7 @@ class PointmassBaseConfigModule(object):
     # MODEL_IN, MODEL_OUT = ?, ?
 
     def __init__(self):
-        cfg = tf.ConfigProto()
+        cfg = tf.ConfigProto(log_device_placement=True)
         cfg.gpu_options.allow_growth = True
         self.SESS = tf.Session(config=cfg)
         self.NN_TRAIN_CFG = {"epochs": 5}
@@ -33,9 +33,9 @@ class PointmassBaseConfigModule(object):
                 "popsize": 10
             },
             "CEM": {
-                "popsize":    50000,
-                "num_elites": 2,
-                "max_iters":  2,
+                "popsize":    400,
+                "num_elites": 40,
+                "max_iters":  5,
                 "alpha":      0.1,
             }
         }
