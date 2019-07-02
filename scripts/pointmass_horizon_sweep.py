@@ -13,6 +13,8 @@ from dmbrl.controllers.MPC import MPC
 from dmbrl.config import create_config
 import tensorflow as tf
 
+from dmbrl.util import save_git_info
+
 
 def exp(steps_needed_to_solve, planning_horizon, logdir):
     tf.reset_default_graph()
@@ -36,8 +38,13 @@ def exp(steps_needed_to_solve, planning_horizon, logdir):
     exp = MBExperiment(cfg.exp_cfg)
 
     os.makedirs(exp.logdir)
+    config_dict = cfg.toDict()
+    config_dict['config_module_kwargs'] = config_module_kwargs
     with open(os.path.join(exp.logdir, "config.txt"), "w") as f:
-        f.write(pprint.pformat(cfg.toDict()))
+        f.write(pprint.pformat(config_dict))
+    save_git_info(exp.logdir)
+
+    print("log dir:", exp.logdir)
 
     # exp.run_experiment()
 
@@ -48,7 +55,7 @@ if __name__ == "__main__":
     parser.add_argument('-logdir', type=str, default='log',
                         help='Directory to which results will be logged (default: ./log)')
     args = parser.parse_args()
-    # exp(8, 10, args.logdir)
+    exp(8, 10, args.logdir)
     #
     # for planning_H in [8, 16, 32]:
     #     for H in [8, 16, 32, 64, 128]:
