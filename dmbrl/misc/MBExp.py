@@ -76,6 +76,8 @@ class MBExperiment:
         self.nrecord = params.log_cfg.get("nrecord", 0)
         self.neval = params.log_cfg.get("neval", 1)
         self.init_iter = params.exp_cfg.get("init_iter", 0)
+        self.nrecord_eval_mode = params.log_cfg.get("nrecord_eval_mode", 0)
+        self.neval_eval_mode = params.log_cfg.get("neval_eval_mode", 1)
 
 
     def run_experiment(self):
@@ -96,18 +98,9 @@ class MBExperiment:
             traj_obs.append(samples[-1]["obs"])
             traj_acs.append(samples[-1]["ac"])
             traj_rews.append(samples[-1]["rewards"])
-        # traj_obs.append(np.array(
-        #     [sample["obs"] for sample in samples[:self.nrollouts_per_iter]]
-        # ))
-        # traj_acs.append(np.array(
-        #     [sample["ac"] for sample in samples[:self.nrollouts_per_iter]]
-        # ))
-        # traj_rets.append(np.array(
-        #     [sample["reward_sum"] for sample in samples[:self.neval]]
-        # ))
-        # traj_rews.append(np.array(
-        #     [sample["rewards"] for sample in samples[:self.nrollouts_per_iter]]
-        # ))
+
+        eval_traj_obs, eval_traj_acs, eval_traj_rets, eval_traj_rews = [], [], [], []
+        eval_samples = []
 
         if self.ninit_rollouts > 0:
             self.policy.train(
@@ -132,6 +125,15 @@ class MBExperiment:
                         os.path.join(iter_dir, "rollout%d.mp4" % j)
                     )
                 )
+            for j in range(self.nrecord_eval_mode):
+                self.env.mode = 'eval'
+                eval_samples.append(
+                    self.agent.sample(
+                        self.task_hor, self.policy,
+                        os.path.join(iter_dir, "eval_rollout%d.mp4" % j)
+                    )
+                )
+                self.env.mode = 'exploration'
             if self.nrecord > 0:
                 for item in filter(lambda f: f.endswith(".json"), os.listdir(iter_dir)):
                     os.remove(os.path.join(iter_dir, item))
@@ -141,27 +143,26 @@ class MBExperiment:
                         self.task_hor, self.policy
                     )
                 )
+            for j in range(self.neval_eval_mode - self.nrecord_eval_mode):
+                self.env.mode = 'eval'
+                eval_samples.append(
+                    self.agent.sample(
+                        self.task_hor, self.policy
+                    )
+                )
+                self.env.mode = 'exploration'
             print("Rewards obtained:", [sample["reward_sum"] for sample in samples[:self.neval]])
-            # traj_obs.append([sample["obs"] for sample in samples[:self.nrollouts_per_iter]])
-            # traj_acs.append([sample["ac"] for sample in samples[:self.nrollouts_per_iter]])
-            # traj_rets.append([sample["reward_sum"] for sample in samples[:self.neval]])
-            # traj_rews.append([sample["rewards"] for sample in samples[:self.nrollouts_per_iter]])
             traj_obs.extend([sample["obs"] for sample in samples[:self.nrollouts_per_iter]])
             traj_acs.extend([sample["ac"] for sample in samples[:self.nrollouts_per_iter]])
             traj_rets.extend([sample["reward_sum"] for sample in samples[:self.neval]])
             traj_rews.extend([sample["rewards"] for sample in samples[:self.nrollouts_per_iter]])
-            # traj_obs.append(np.array(
-            #     [sample["obs"] for sample in samples[:self.nrollouts_per_iter]]
-            # ))
-            # traj_acs.append(np.array(
-            #     [sample["ac"] for sample in samples[:self.nrollouts_per_iter]]
-            # ))
-            # traj_rets.append(np.array(
-            #     [sample["reward_sum"] for sample in samples[:self.neval]]
-            # ))
-            # traj_rews.append(np.array(
-            #     [sample["rewards"] for sample in samples[:self.nrollouts_per_iter]]
-            # ))
+
+            print("Eval rewards obtained:", [sample["reward_sum"] for sample in eval_samples[:self.neval]])
+            eval_traj_obs.extend([sample["obs"] for sample in eval_samples[:self.nrollouts_per_iter]])
+            eval_traj_acs.extend([sample["ac"] for sample in eval_samples[:self.nrollouts_per_iter]])
+            eval_traj_rets.extend([sample["reward_sum"] for sample in eval_samples[:self.neval]])
+            eval_traj_rews.extend([sample["rewards"] for sample in eval_samples[:self.nrollouts_per_iter]])
+
             samples = samples[:self.nrollouts_per_iter]
 
             self.policy.dump_logs(self.logdir, iter_dir)
@@ -171,7 +172,11 @@ class MBExperiment:
                     "observations": traj_obs,
                     "actions": traj_acs,
                     "returns": traj_rets,
-                    "rewards": traj_rews
+                    "rewards": traj_rews,
+                    "eval observations": eval_traj_obs,
+                    "eval actions": eval_traj_acs,
+                    "eval returns": eval_traj_rets,
+                    "eval rewards": eval_traj_rews
                 }
             )
             # Delete iteration directory if not used

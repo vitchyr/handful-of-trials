@@ -17,17 +17,20 @@ class PointmassUWallConfigModule(PointmassBaseConfigModule):
     # TASK_HORIZON = 100
     NTRAIN_ITERS = 100
     NROLLOUTS_PER_ITER = 1
-    NUM_STEPS_TOTAL = int(2**14)
+    NUM_STEPS_TOTAL = int(2**16)
     PLAN_HOR = 10
     MODEL_IN, MODEL_OUT = 6, 4
     GP_NINDUCING_POINTS = 200
     PATH_LENGTH_TO_SOLVE = 16.
 
-    def __init__(self, steps_needed_to_solve, planning_horizon):
+    def __init__(self, steps_needed_to_solve, planning_horizon,
+                 task_horizon_factor=2):
         env = gym.make("PointmassUWallTrainEnvBig-v1")
         env.action_scale = self.PATH_LENGTH_TO_SOLVE / steps_needed_to_solve
         env = FlatGoalEnv(env, append_goal_to_obs=True)
-        PointmassUWallConfigModule.TASK_HORIZON = int(2*steps_needed_to_solve)
+        PointmassUWallConfigModule.TASK_HORIZON = int(
+            task_horizon_factor * steps_needed_to_solve
+        )
         PointmassUWallConfigModule.PLAN_HOR = planning_horizon
         PointmassUWallConfigModule.NROLLOUTS_PER_ITER = math.ceil(
             PointmassUWallConfigModule.NUM_STEPS_TOTAL / (
@@ -39,7 +42,7 @@ class PointmassUWallConfigModule(PointmassBaseConfigModule):
         print("task horizon", PointmassUWallConfigModule.TASK_HORIZON)
         print("plan horizon", PointmassUWallConfigModule.PLAN_HOR)
         print("nrolls per iter", PointmassUWallConfigModule.NROLLOUTS_PER_ITER)
-        print("action_scale", env.action_scale)
+        print("action_scale", env.wrapped_env.action_scale)
         print('-------------')
         self.ENV = env
         cfg = tf.ConfigProto()

@@ -25,11 +25,14 @@ def exp(steps_needed_to_solve, planning_horizon, logdir):
     overrides = [
         ["exp_cfg.log_cfg.nrecord", 1],
         ["exp_cfg.log_cfg.neval", 5],
-        # ["exp_cfg.exp_cfg.ntrain_iters", 2],
+        ["exp_cfg.log_cfg.nrecord_eval_mode", 1],
+        ["exp_cfg.log_cfg.neval_eval_mode", 5],
+        ["exp_cfg.exp_cfg.ntrain_iters", 2],
     ]
     config_module_kwargs = {
         'steps_needed_to_solve': steps_needed_to_solve,
-        'planning_horizon': planning_horizon
+        'planning_horizon': planning_horizon,
+        'task_horizon_factor': 4,
     }
     ctrl_args = DotMap(**{key: val for (key, val) in ctrl_args})
     cfg = create_config(env, ctrl_type, ctrl_args, overrides, logdir,
@@ -60,8 +63,9 @@ if __name__ == "__main__":
     parser.add_argument('-logdir', type=str, default='log/test',
                         help='Directory to which results will be logged (default: ./log)')
     args = parser.parse_args()
-    for planning_H in [4, 8, 16]:
-        exp(8, planning_H, args.logdir)
+    exp(8, 2, args.logdir)
+    # for planning_H in [4, 8, 16]:
+    #     exp(8, planning_H, args.logdir)
     #
     # for planning_H in [8, 'half', 'same']:
     #     for required_H in [8, 16, 32, 64]:
