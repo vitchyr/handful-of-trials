@@ -24,6 +24,8 @@ def exp(steps_needed_to_solve, planning_horizon, logdir):
     ctrl_args = []
     overrides = [
         ["exp_cfg.log_cfg.nrecord", 1],
+        ["exp_cfg.log_cfg.neval", 5],
+        # ["exp_cfg.exp_cfg.ntrain_iters", 2],
     ]
     config_module_kwargs = {
         'steps_needed_to_solve': steps_needed_to_solve,
@@ -55,7 +57,7 @@ def exp(steps_needed_to_solve, planning_horizon, logdir):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('-H', type=int, default=8)
-    parser.add_argument('-logdir', type=str, default='log',
+    parser.add_argument('-logdir', type=str, default='log/test',
                         help='Directory to which results will be logged (default: ./log)')
     args = parser.parse_args()
     for planning_H in [4, 8, 16]:

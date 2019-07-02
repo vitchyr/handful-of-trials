@@ -96,6 +96,18 @@ class MBExperiment:
             traj_obs.append(samples[-1]["obs"])
             traj_acs.append(samples[-1]["ac"])
             traj_rews.append(samples[-1]["rewards"])
+        # traj_obs.append(np.array(
+        #     [sample["obs"] for sample in samples[:self.nrollouts_per_iter]]
+        # ))
+        # traj_acs.append(np.array(
+        #     [sample["ac"] for sample in samples[:self.nrollouts_per_iter]]
+        # ))
+        # traj_rets.append(np.array(
+        #     [sample["reward_sum"] for sample in samples[:self.neval]]
+        # ))
+        # traj_rews.append(np.array(
+        #     [sample["rewards"] for sample in samples[:self.nrollouts_per_iter]]
+        # ))
 
         if self.ninit_rollouts > 0:
             self.policy.train(
@@ -130,10 +142,26 @@ class MBExperiment:
                     )
                 )
             print("Rewards obtained:", [sample["reward_sum"] for sample in samples[:self.neval]])
+            # traj_obs.append([sample["obs"] for sample in samples[:self.nrollouts_per_iter]])
+            # traj_acs.append([sample["ac"] for sample in samples[:self.nrollouts_per_iter]])
+            # traj_rets.append([sample["reward_sum"] for sample in samples[:self.neval]])
+            # traj_rews.append([sample["rewards"] for sample in samples[:self.nrollouts_per_iter]])
             traj_obs.extend([sample["obs"] for sample in samples[:self.nrollouts_per_iter]])
             traj_acs.extend([sample["ac"] for sample in samples[:self.nrollouts_per_iter]])
             traj_rets.extend([sample["reward_sum"] for sample in samples[:self.neval]])
             traj_rews.extend([sample["rewards"] for sample in samples[:self.nrollouts_per_iter]])
+            # traj_obs.append(np.array(
+            #     [sample["obs"] for sample in samples[:self.nrollouts_per_iter]]
+            # ))
+            # traj_acs.append(np.array(
+            #     [sample["ac"] for sample in samples[:self.nrollouts_per_iter]]
+            # ))
+            # traj_rets.append(np.array(
+            #     [sample["reward_sum"] for sample in samples[:self.neval]]
+            # ))
+            # traj_rews.append(np.array(
+            #     [sample["rewards"] for sample in samples[:self.nrollouts_per_iter]]
+            # ))
             samples = samples[:self.nrollouts_per_iter]
 
             self.policy.dump_logs(self.logdir, iter_dir)

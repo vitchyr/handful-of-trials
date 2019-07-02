@@ -18,9 +18,9 @@ class Agent:
         Arguments:
             params: (DotMap) A DotMap of agent parameters.
                 .env: (OpenAI gym environment) The environment for this agent.
-                .noisy_actions: (bool) Indicates whether random Gaussian noise will 
+                .noisy_actions: (bool) Indicates whether random Gaussian noise will
                     be added to the actions of this agent.
-                .noise_stddev: (float) The standard deviation to be used for the 
+                .noise_stddev: (float) The standard deviation to be used for the
                     action noise if params.noisy_actions is True.
         """
         self.env = params.env
@@ -37,7 +37,7 @@ class Agent:
     def sample(self, horizon, policy, record_fname=None):
         """Samples a rollout from the agent.
 
-        Arguments: 
+        Arguments:
             horizon: (int) The length of the rollout to generate from the agent.
             policy: (policy) The policy that the agent will use for actions.
             record_fname: (str/None) The name of the file to which a recording of the rollout
