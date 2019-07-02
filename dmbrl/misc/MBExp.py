@@ -76,8 +76,6 @@ class MBExperiment:
         self.nrecord = params.log_cfg.get("nrecord", 0)
         self.neval = params.log_cfg.get("neval", 1)
         self.init_iter = params.exp_cfg.get("init_iter", 0)
-        import ipdb; ipdb.set_trace()
-        pass
 
 
     def run_experiment(self):

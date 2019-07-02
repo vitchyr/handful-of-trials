@@ -67,10 +67,11 @@ class CartpoleConfigModule:
 
     @staticmethod
     def ac_cost_fn(acs):
-        if isinstance(acs, np.ndarray):
-            return 0.01 * np.sum(np.square(acs), axis=1)
-        else:
-            return 0.01 * tf.reduce_sum(tf.square(acs), axis=1)
+        return 0
+        # if isinstance(acs, np.ndarray):
+        #     return 0.01 * np.sum(np.square(acs), axis=1)
+        # else:
+        #     return 0.01 * tf.reduce_sum(tf.square(acs), axis=1)
 
     def nn_constructor(self, model_init_cfg):
         model = get_required_argument(model_init_cfg, "model_class", "Must provide model class")(DotMap(

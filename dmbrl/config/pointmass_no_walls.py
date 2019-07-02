@@ -13,10 +13,11 @@ register_custom_envs()
 
 class PointmassNoWallConfigModule(PointmassBaseConfigModule):
     TASK_HORIZON = 100
-    NTRAIN_ITERS = 20
+    NTRAIN_ITERS = 100
     NROLLOUTS_PER_ITER = 1
-    PLAN_HOR = 5
+    PLAN_HOR = 10
     MODEL_IN, MODEL_OUT = 6, 4
+    GP_NINDUCING_POINTS = 200
 
     def __init__(self):
         super().__init__()

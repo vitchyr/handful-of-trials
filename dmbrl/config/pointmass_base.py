@@ -45,17 +45,11 @@ class PointmassBaseConfigModule(object):
 
     @staticmethod
     def obs_preproc(obs):
-        if isinstance(obs, np.ndarray):
-            return obs
-        else:
-            return obs
+        return obs
 
     @staticmethod
     def obs_postproc(obs, pred):
-        if isinstance(obs, np.ndarray):
-            return obs
-        else:
-            return obs
+        return obs + pred
 
     @staticmethod
     def targ_proc(obs, next_obs):

@@ -13,11 +13,12 @@ register_custom_envs()
 
 
 class PointmassUWallConfigModule(PointmassBaseConfigModule):
-    TASK_HORIZON       = 5
-    NTRAIN_ITERS       = 10
+    TASK_HORIZON = 100
+    NTRAIN_ITERS = 100
     NROLLOUTS_PER_ITER = 1
-    PLAN_HOR           = 5
+    PLAN_HOR = 10
     MODEL_IN, MODEL_OUT = 6, 4
+    GP_NINDUCING_POINTS = 200
 
     def __init__(self):
         env = gym.make("PointmassUWallTestEnvBig-v1")

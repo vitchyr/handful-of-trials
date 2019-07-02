@@ -17,12 +17,11 @@ class PointmassReachFixedPointConfigModule(PointmassBaseConfigModule):
     TASK_HORIZON = 100
     NTRAIN_ITERS = 100
     NROLLOUTS_PER_ITER = 1
-    PLAN_HOR = 5
+    PLAN_HOR = 10
     MODEL_IN, MODEL_OUT = 4, 2
     GP_NINDUCING_POINTS = 200
 
     GOAL_NP = np.array([1, 1])
-    GOAL_TF = tf.constant([1, 1], dtype=tf.float32)
 
     def __init__(self):
         super().__init__()
@@ -32,7 +31,6 @@ class PointmassReachFixedPointConfigModule(PointmassBaseConfigModule):
 
     @staticmethod
     def obs_cost_fn(obs):
-        # In this env,
         if isinstance(obs, np.ndarray):
             return np.sum(
                 np.square(obs - PointmassReachFixedPointConfigModule.GOAL_NP),
@@ -40,9 +38,19 @@ class PointmassReachFixedPointConfigModule(PointmassBaseConfigModule):
             )
         else:
             return tf.reduce_sum(
-                tf.square(obs - PointmassReachFixedPointConfigModule.GOAL_TF),
+                tf.square(obs - PointmassReachFixedPointConfigModule.GOAL_NP),
                 axis=1,
             )
+        # if isinstance(obs, np.ndarray):
+        #     return -np.exp(-np.sum(
+        #         np.square(obs - PointmassReachFixedPointConfigModule.GOAL_NP),
+        #         axis=1,
+        #     ))
+        # else:
+        #     return -tf.exp(-tf.reduce_sum(
+        #         tf.square(obs - PointmassReachFixedPointConfigModule.GOAL_NP),
+        #         axis=1,
+        #     ))
 
 
 CONFIG_MODULE = PointmassReachFixedPointConfigModule
