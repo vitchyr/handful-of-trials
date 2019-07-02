@@ -2,6 +2,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+import json
 import os
 import argparse
 import pprint
@@ -11,6 +12,7 @@ from dotmap import DotMap
 from dmbrl.misc.MBExp import MBExperiment
 from dmbrl.controllers.MPC import MPC
 from dmbrl.config import create_config
+from dmbrl.util import MyEncoder, save_git_info
 
 
 def main(env, ctrl_type, ctrl_args, overrides, logdir):
@@ -23,8 +25,12 @@ def main(env, ctrl_type, ctrl_args, overrides, logdir):
     exp = MBExperiment(cfg.exp_cfg)
 
     os.makedirs(exp.logdir)
+    config_dict = cfg.toDict()
     with open(os.path.join(exp.logdir, "config.txt"), "w") as f:
-        f.write(pprint.pformat(cfg.toDict()))
+        f.write(pprint.pformat(config_dict))
+    with open(os.path.join(exp.logdir, "variant.json"), "w") as f:
+        json.dump(config_dict, f, indent=2, sort_keys=True, cls=MyEncoder)
+    save_git_info(exp.logdir)
 
     exp.run_experiment()
 

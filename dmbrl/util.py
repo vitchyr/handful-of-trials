@@ -1,5 +1,7 @@
+import json
 import os.path as osp
 from collections import namedtuple
+from enum import Enum
 
 GitInfo = namedtuple(
     'GitInfo',
@@ -11,6 +13,7 @@ GitInfo = namedtuple(
         'branch_name',
     ],
 )
+
 
 def save_git_info(logdir):
     git_infos = get_git_info()
@@ -73,3 +76,25 @@ def get_git_info():
         git_infos = None
     return git_infos
 
+
+class MyEncoder(json.JSONEncoder):
+    def default(self, o):
+        if isinstance(o, type):
+            return {'$class': o.__module__ + "." + o.__name__}
+        elif isinstance(o, Enum):
+            return {
+                '$enum': o.__module__ + "." + o.__class__.__name__ + '.' + o.name
+            }
+        elif callable(o):
+            return {
+                '$function': o.__module__ + "." + o.__name__
+            }
+        try:
+            return json.JSONEncoder.default(self, o)
+        except TypeError as e:
+            if isinstance(o, object):
+                return {
+                    '$object': str(o)
+                }
+            else:
+                raise e

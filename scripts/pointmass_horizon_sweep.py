@@ -2,6 +2,7 @@ from __future__ import division
 from __future__ import print_function
 from __future__ import absolute_import
 
+import json
 import os
 import argparse
 import pprint
@@ -13,7 +14,7 @@ from dmbrl.controllers.MPC import MPC
 from dmbrl.config import create_config
 import tensorflow as tf
 
-from dmbrl.util import save_git_info
+from dmbrl.util import save_git_info, MyEncoder
 
 
 def exp(steps_needed_to_solve, planning_horizon, logdir):
@@ -42,11 +43,13 @@ def exp(steps_needed_to_solve, planning_horizon, logdir):
     config_dict['config_module_kwargs'] = config_module_kwargs
     with open(os.path.join(exp.logdir, "config.txt"), "w") as f:
         f.write(pprint.pformat(config_dict))
+    with open(os.path.join(exp.logdir, "variant.json"), "w") as f:
+        json.dump(config_dict, f, indent=2, sort_keys=True, cls=MyEncoder)
     save_git_info(exp.logdir)
 
     print("log dir:", exp.logdir)
 
-    # exp.run_experiment()
+    exp.run_experiment()
 
 
 if __name__ == "__main__":
@@ -55,8 +58,13 @@ if __name__ == "__main__":
     parser.add_argument('-logdir', type=str, default='log',
                         help='Directory to which results will be logged (default: ./log)')
     args = parser.parse_args()
-    exp(8, 10, args.logdir)
+    for planning_H in [4, 8, 16]:
+        exp(8, planning_H, args.logdir)
     #
-    # for planning_H in [8, 16, 32]:
-    #     for H in [8, 16, 32, 64, 128]:
-    #         exp(H, args.logdir)
+    # for planning_H in [8, 'half', 'same']:
+    #     for required_H in [8, 16, 32, 64]:
+    #         if planning_H == 'half':
+    #             planning_H = required_H // 2
+    #         elif planning_H == 'same':
+    #             planning_H = required_H
+    #         exp(required_H, planning_H, args.logdir)
