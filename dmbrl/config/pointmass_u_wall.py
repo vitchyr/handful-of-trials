@@ -19,10 +19,14 @@ class PointmassUWallConfigModule(PointmassBaseConfigModule):
     PLAN_HOR = 10
     MODEL_IN, MODEL_OUT = 6, 4
     GP_NINDUCING_POINTS = 200
+    PATH_LENGTH_TO_SOLVE = 16.
 
-    def __init__(self):
+    def __init__(self, steps_needed_to_solve, planning_horizon):
         env = gym.make("PointmassUWallTestEnvBig-v1")
         env = FlatGoalEnv(env, append_goal_to_obs=True)
+        env.action_scale = self.PATH_LENGTH_TO_SOLVE / steps_needed_to_solve
+        PointmassUWallConfigModule.TASK_HORIZON = int(2*steps_needed_to_solve)
+        PointmassUWallConfigModule.PLAN_HOR = planning_horizon
         self.ENV = env
         cfg = tf.ConfigProto()
         cfg.gpu_options.allow_growth = True

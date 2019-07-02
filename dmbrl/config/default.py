@@ -12,7 +12,10 @@ from dotmap import DotMap
 from dmbrl.modeling.models import NN, BNN, TFGP
 
 
-def create_config(env_name, ctrl_type, ctrl_args, overrides, logdir):
+def create_config(env_name, ctrl_type, ctrl_args, overrides, logdir,
+                  config_module_kwargs=None):
+    if config_module_kwargs is None:
+        config_module_kwargs = {}
     cfg = DotMap()
     type_map = DotMap(
         exp_cfg=DotMap(
@@ -56,7 +59,7 @@ def create_config(env_name, ctrl_type, ctrl_args, overrides, logdir):
     spec = importlib.util.spec_from_loader(loader.name, loader)
     cfg_source = importlib.util.module_from_spec(spec)
     loader.exec_module(cfg_source)
-    cfg_module = cfg_source.CONFIG_MODULE()
+    cfg_module = cfg_source.CONFIG_MODULE(**config_module_kwargs)
 
     _create_exp_config(cfg.exp_cfg, cfg_module, logdir, type_map)
     _create_ctrl_config(cfg.ctrl_cfg, cfg_module, ctrl_type, ctrl_args, type_map)
