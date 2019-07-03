@@ -83,6 +83,9 @@ class MBExperiment:
         self.nrecord_eval_mode = params.log_cfg.get("nrecord_eval_mode", 0)
         self.neval_eval_mode = params.log_cfg.get("neval_eval_mode", 1)
 
+        assert max(self.neval, self.nrollouts_per_iter) >= self.nrecord
+        assert self.neval_eval_mode >= self.nrecord_eval_mode
+
 
     def run_experiment(self):
         """Perform experiment.
@@ -168,7 +171,7 @@ class MBExperiment:
             eval_traj_rews.extend([sample["rewards"] for sample in eval_samples[:self.nrollouts_per_iter]])
 
             samples = samples[:self.nrollouts_per_iter]
-            eval_samples = eval_samples[:self.nrecord_eval_mode]
+            eval_samples = eval_samples[:self.neval_eval_mode]
 
             self.policy.dump_logs(self.logdir, iter_dir)
             stats_to_save = {
@@ -191,10 +194,11 @@ class MBExperiment:
             append_log(
                 stats_to_log,
                 get_generic_path_information(eval_samples),
-                prefix='eval_exploration/',
+                prefix='eval/',
             )
             for k, v in stats_to_log.items():
                 logger.record_tabular(k, v)
+            logger.record_tabular('iteration', i)
             logger.dump_tabular()
             if len(os.listdir(iter_dir)) == 0:
                 os.rmdir(iter_dir)
