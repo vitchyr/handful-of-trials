@@ -51,6 +51,7 @@ class Agent:
 
         times, rewards = [], []
         O, A, reward_sum, done = [self.env.reset()], [], 0, False
+        env_infos = []
 
         policy.reset()
         for t in range(horizon):
@@ -67,6 +68,7 @@ class Agent:
                 action = np.minimum(np.maximum(action, self.env.action_space.low), self.env.action_space.high)
                 obs, reward, done, info = self.env.step(action)
             O.append(obs)
+            env_infos.append(info)
             reward_sum += reward
             rewards.append(reward)
             if done:
@@ -84,4 +86,5 @@ class Agent:
             "ac": np.array(A),
             "reward_sum": reward_sum,
             "rewards": np.array(rewards),
+            "env_infos": env_infos,
         }

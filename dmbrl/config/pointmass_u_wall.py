@@ -17,7 +17,8 @@ class PointmassUWallConfigModule(PointmassBaseConfigModule):
     # TASK_HORIZON = 100
     NTRAIN_ITERS = 100
     NROLLOUTS_PER_ITER = 1
-    NUM_STEPS_TOTAL = int(2**16)
+    # NUM_STEPS_TOTAL = int(2**16)
+    NUM_STEPS_TOTAL = int(2**8)
     PLAN_HOR = 10
     MODEL_IN, MODEL_OUT = 6, 4
     GP_NINDUCING_POINTS = 200

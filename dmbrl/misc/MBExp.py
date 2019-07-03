@@ -3,14 +3,18 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import os
+from collections import OrderedDict
+
 from time import time, localtime, strftime
 
 import numpy as np
 from scipy.io import savemat
 from dotmap import DotMap
 
+from dmbrl.logging import logger, append_log
 from dmbrl.misc.DotmapUtils import get_required_argument
 from dmbrl.misc.Agent import Agent
+from dmbrl.util import get_generic_path_information
 
 
 class MBExperiment:
@@ -100,7 +104,6 @@ class MBExperiment:
             traj_rews.append(samples[-1]["rewards"])
 
         eval_traj_obs, eval_traj_acs, eval_traj_rets, eval_traj_rews = [], [], [], []
-        eval_samples = []
 
         if self.ninit_rollouts > 0:
             self.policy.train(
@@ -118,6 +121,7 @@ class MBExperiment:
             os.makedirs(iter_dir, exist_ok=True)
 
             samples = []
+            eval_samples = []
             for j in range(self.nrecord):
                 samples.append(
                     self.agent.sample(
@@ -164,22 +168,34 @@ class MBExperiment:
             eval_traj_rews.extend([sample["rewards"] for sample in eval_samples[:self.nrollouts_per_iter]])
 
             samples = samples[:self.nrollouts_per_iter]
+            eval_samples = eval_samples[:self.nrecord_eval_mode]
 
             self.policy.dump_logs(self.logdir, iter_dir)
-            savemat(
-                os.path.join(self.logdir, "logs.mat"),
-                {
-                    "observations": traj_obs,
-                    "actions": traj_acs,
-                    "returns": traj_rets,
-                    "rewards": traj_rews,
-                    "eval observations": eval_traj_obs,
-                    "eval actions": eval_traj_acs,
-                    "eval returns": eval_traj_rets,
-                    "eval rewards": eval_traj_rews
-                }
+            stats_to_save = {
+                "observations": traj_obs,
+                "actions": traj_acs,
+                "returns": traj_rets,
+                "rewards": traj_rews,
+                "eval observations": eval_traj_obs,
+                "eval actions": eval_traj_acs,
+                "eval returns": eval_traj_rets,
+                "eval rewards": eval_traj_rews
+            }
+            savemat(os.path.join(self.logdir, "logs.mat"), stats_to_save)
+            stats_to_log = OrderedDict()
+            append_log(
+                stats_to_log,
+                get_generic_path_information(samples),
+                prefix='exploration/',
             )
-            # Delete iteration directory if not used
+            append_log(
+                stats_to_log,
+                get_generic_path_information(eval_samples),
+                prefix='eval_exploration/',
+            )
+            for k, v in stats_to_log.items():
+                logger.record_tabular(k, v)
+            logger.dump_tabular()
             if len(os.listdir(iter_dir)) == 0:
                 os.rmdir(iter_dir)
 
