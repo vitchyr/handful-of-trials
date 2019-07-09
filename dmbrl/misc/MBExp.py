@@ -186,11 +186,12 @@ class MBExperiment:
             }
             savemat(os.path.join(self.logdir, "logs.mat"), stats_to_save)
             stats_to_log = OrderedDict()
-            append_log(
-                stats_to_log,
-                get_generic_path_information(samples),
-                prefix='exploration/',
-            )
+            if len(samples):
+                append_log(
+                    stats_to_log,
+                    get_generic_path_information(samples),
+                    prefix='exploration/',
+                )
             append_log(
                 stats_to_log,
                 get_generic_path_information(eval_samples),
