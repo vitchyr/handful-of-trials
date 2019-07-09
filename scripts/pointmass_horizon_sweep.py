@@ -24,19 +24,18 @@ def exp(steps_needed_to_solve, planning_horizon, logdir):
     ctrl_type = "MPC"
     ctrl_args = []
     overrides = [
-        # ["exp_cfg.log_cfg.nrecord", 1],
-        # ["exp_cfg.log_cfg.neval", 5],
-        # ["exp_cfg.log_cfg.nrecord_eval_mode", 1],
-        # ["exp_cfg.log_cfg.neval_eval_mode", 5],
-        # ["exp_cfg.log_cfg.nrecord", 2],
+        ["exp_cfg.log_cfg.nrecord", 1],
         ["exp_cfg.log_cfg.neval", 5],
-        # ["exp_cfg.log_cfg.nrecord_eval_mode", 1],
+        ["exp_cfg.log_cfg.nrecord_eval_mode", 1],
         ["exp_cfg.log_cfg.neval_eval_mode", 5],
-        ["exp_cfg.exp_cfg.ntrain_iters", 3],
-        ["ctrl_cfg.opt_cfg.plan_hor", 1],
-        ["ctrl_cfg.opt_cfg.cfg.popsize", 5],
-        ["ctrl_cfg.opt_cfg.cfg.num_elites", 2],
-        ["ctrl_cfg.opt_cfg.cfg.max_iters", 1],
+        # ["exp_cfg.log_cfg.nrecord", 2],
+        # ["exp_cfg.log_cfg.neval", 5],
+        # ["exp_cfg.log_cfg.neval_eval_mode", 5],
+        # ["exp_cfg.exp_cfg.ntrain_iters", 3],
+        # ["ctrl_cfg.opt_cfg.plan_hor", 1],
+        # ["ctrl_cfg.opt_cfg.cfg.popsize", 5],
+        # ["ctrl_cfg.opt_cfg.cfg.num_elites", 2],
+        # ["ctrl_cfg.opt_cfg.cfg.max_iters", 1],
     ]
     config_module_kwargs = {
         'steps_needed_to_solve': steps_needed_to_solve,
@@ -76,7 +75,9 @@ if __name__ == "__main__":
     parser.add_argument('-logdir', type=str, default='log/test',
                         help='Directory to which results will be logged (default: ./log)')
     args = parser.parse_args()
-    exp(8, 3, args.logdir)
+    # exp(8, 3, args.logdir)
+    for planning_H in [4, 8, 16, 20]:
+        exp(4, planning_H, args.logdir)
     # for planning_H in [4, 8, 16, 20]:
     #     exp(8, planning_H, args.logdir)
 
