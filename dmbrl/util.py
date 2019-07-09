@@ -127,7 +127,7 @@ def get_generic_path_information(paths, stat_prefix=''):
     ))
 
     statistics[stat_prefix + 'Num Paths'] = len(paths)
-    for info_key in ['env_infos']:
+    for info_key in ['env_infos', 'agent_infos']:
         if info_key in paths[0]:
             all_env_infos = [
                 list_of_dicts__to__dict_of_lists(p[info_key])
@@ -219,10 +219,12 @@ def list_of_dicts__to__dict_of_lists(lst):
     if len(lst) == 0:
         return {}
     keys = lst[0].keys()
-    output_dict = defaultdict(list)
+    output_dict = OrderedDict()
     for d in lst:
         assert set(d.keys()) == set(keys)
-        for k in keys:
+        for k in sorted(keys):
+            if k not in output_dict:
+                output_dict[k] = []
             output_dict[k].append(d[k])
     return output_dict
 

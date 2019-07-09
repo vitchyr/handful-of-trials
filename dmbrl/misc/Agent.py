@@ -52,13 +52,18 @@ class Agent:
         times, rewards = [], []
         O, A, reward_sum, done = [self.env.reset()], [], 0, False
         env_infos = []
+        agent_infos = []
 
         policy.reset()
         for t in range(horizon):
             if video_record:
                 recorder.capture_frame()
             start = time.time()
-            A.append(policy.act(O[t], t))
+            action, predicted_cost = policy.act(O[t], t)
+            A.append(action)
+            agent_infos.append({
+                'predicted_cost': predicted_cost
+            })
             times.append(time.time() - start)
 
             if self.noise_stddev is None:
@@ -87,4 +92,5 @@ class Agent:
             "reward_sum": reward_sum,
             "rewards": np.array(rewards),
             "env_infos": env_infos,
+            "agent_infos": agent_infos,
         }
