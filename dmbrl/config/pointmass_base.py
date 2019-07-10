@@ -63,6 +63,10 @@ class PointmassBaseConfigModule(object):
                 axis=1,
             )
         else:
+            # return -tf.exp(-tf.reduce_sum(
+            #     tf.square(obs[:, :2] - obs[:, 2:]),
+            #     axis=1,
+            # ))
             return tf.reduce_sum(
                 tf.square(obs[:, :2] - obs[:, 2:]),
                 axis=1,
