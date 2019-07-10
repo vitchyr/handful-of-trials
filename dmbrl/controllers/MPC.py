@@ -151,6 +151,7 @@ class MPC(Controller):
         if self.log_particles:
             print("Controller is logging particle predictions (Note: This may be memory-intensive).")
             self.pred_particles = []
+            self.pred_actions = []
         elif self.log_traj_preds:
             print("Controller is logging trajectory prediction statistics (mean+var).")
             self.pred_means, self.pred_vars = [], []
@@ -232,6 +233,7 @@ class MPC(Controller):
             pred_cost, pred_traj = pred_cost[0], pred_traj[:, 0]
             if self.log_particles:
                 self.pred_particles.append(pred_traj)
+                self.pred_actions.append(soln)
             else:
                 self.pred_means.append(np.mean(pred_traj, axis=1))
                 self.pred_vars.append(np.mean(np.square(pred_traj - self.pred_means[-1]), axis=1))
@@ -253,8 +255,13 @@ class MPC(Controller):
         """
         self.model.save(iter_logdir if self.save_all_models else primary_logdir)
         if self.log_particles:
-            savemat(os.path.join(iter_logdir, "predictions.mat"), {"predictions": self.pred_particles})
+            savemat(os.path.join(iter_logdir, "predictions.mat"), {
+                "predictions": self.pred_particles,
+                "actions": self.pred_actions,
+
+            })
             self.pred_particles = []
+            self.pred_actions = []
         elif self.log_traj_preds:
             savemat(
                 os.path.join(iter_logdir, "predictions.mat"),
