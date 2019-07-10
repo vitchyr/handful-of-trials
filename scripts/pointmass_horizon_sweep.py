@@ -36,6 +36,9 @@ def exp(steps_needed_to_solve, planning_horizon, logdir):
         # ["ctrl_cfg.opt_cfg.cfg.popsize", 5],
         # ["ctrl_cfg.opt_cfg.cfg.num_elites", 2],
         # ["ctrl_cfg.opt_cfg.cfg.max_iters", 1],
+        ["ctrl_cfg.opt_cfg.cfg.popsize", "200"],
+        ["ctrl_cfg.opt_cfg.cfg.num_elites", "20"],
+        ["ctrl_cfg.opt_cfg.cfg.max_iters", "5"],
     ]
     config_module_kwargs = {
         'steps_needed_to_solve': steps_needed_to_solve,
@@ -45,6 +48,8 @@ def exp(steps_needed_to_solve, planning_horizon, logdir):
     ctrl_args = DotMap(**{key: val for (key, val) in ctrl_args})
     cfg = create_config(env, ctrl_type, ctrl_args, overrides, logdir,
                         config_module_kwargs)
+    # HACK
+    cfg.ctrl_cfg.opt_cfg.task_hor = cfg.exp_cfg.sim_cfg.task_hor
     cfg.pprint()
 
     if ctrl_type == "MPC":

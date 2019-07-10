@@ -49,7 +49,6 @@ def main(
         # ["ctrl_cfg.opt_cfg.cfg.num_elites", "4"],
         # ["ctrl_cfg.opt_cfg.cfg.max_iters", "5"],
         ["ctrl_cfg.opt_cfg.plan_hor", "8"],
-        ["ctrl_cfg.opt_cfg.task_hor", "12"],
         ["ctrl_cfg.log_cfg.log_particles", "True"],
         ["ctrl_cfg.log_cfg.log_traj_preds", "True"],
     ]
@@ -59,6 +58,8 @@ def main(
         env, ctrl_type, ctrl_args, overrides, logdir,
         config_module_kwargs=config_module_kwargs
     )
+    # HACK
+    cfg.ctrl_cfg.opt_cfg.task_hor = cfg.exp_cfg.sim_cfg.task_hor
     cfg.pprint()
 
     if ctrl_type == "MPC":
