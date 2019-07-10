@@ -100,6 +100,7 @@ class MPC(Controller):
 
         self.opt_mode = get_required_argument(params.opt_cfg, "mode", "Must provide optimization method.")
         self.plan_hor = get_required_argument(params.opt_cfg, "plan_hor", "Must provide planning horizon.")
+        self.task_hor = get_required_argument(params.opt_cfg, "task_hor", "Must provide task horizon.")
         self.obs_cost_fn = get_required_argument(params.opt_cfg, "obs_cost_fn", "Must provide cost on observations.")
         self.ac_cost_fn = get_required_argument(params.opt_cfg, "ac_cost_fn", "Must provide cost on actions.")
 
@@ -134,10 +135,14 @@ class MPC(Controller):
         self.train_targs = np.array([]).reshape(
             0, self.targ_proc(np.zeros([1, self.dO]), np.zeros([1, self.dO])).shape[-1]
         )
+        self.prev_pred_cost = 0
         if self.model.is_tf_model:
             self.sy_cur_obs = tf.Variable(np.zeros(self.dO), dtype=tf.float32)
+            self.time_in_episode_ph = tf.placeholder(shape=(), dtype=tf.int32)
             self.ac_seq = tf.placeholder(shape=[1, self.plan_hor*self.dU], dtype=tf.float32)
-            self.pred_cost, self.pred_traj = self._compile_cost(self.ac_seq, get_pred_trajs=True)
+            self.pred_cost, self.pred_traj = self._compile_cost(
+                self.time_in_episode_ph, self.ac_seq, get_pred_trajs=True
+            )
             self.optimizer.setup(self._compile_cost, True)
             self.model.sess.run(tf.variables_initializer([self.sy_cur_obs]))
         else:
@@ -203,43 +208,55 @@ class MPC(Controller):
 
         Returns: An action (and possibly the predicted cost)
         """
+        pred_cost = self.prev_pred_cost
         if not self.has_been_trained:
-            return np.random.uniform(self.ac_lb, self.ac_ub, self.ac_lb.shape)
-        if self.ac_buf.shape[0] > 0:
+            action = np.random.uniform(self.ac_lb, self.ac_ub, self.ac_lb.shape)
+        elif self.ac_buf.shape[0] > 0:
             action, self.ac_buf = self.ac_buf[0], self.ac_buf[1:]
-            return action
-
-        if self.model.is_tf_model:
-            self.sy_cur_obs.load(obs, self.model.sess)
-
-        soln = self.optimizer.obtain_solution(self.prev_sol, self.init_var)
-        self.prev_sol = np.concatenate([np.copy(soln)[self.per*self.dU:], np.zeros(self.per*self.dU)])
-        self.ac_buf = soln[:self.per*self.dU].reshape(-1, self.dU)
-
-        if get_pred_cost and not (self.log_traj_preds or self.log_particles):
+        else:
             if self.model.is_tf_model:
-                pred_cost = self.model.sess.run(
-                    self.pred_cost,
-                    feed_dict={self.ac_seq: soln[None]}
-                )[0]
-            else:
-                raise NotImplementedError()
-            return self.act(obs, t), pred_cost
-        elif self.log_traj_preds or self.log_particles:
-            pred_cost, pred_traj = self.model.sess.run(
-                [self.pred_cost, self.pred_traj],
-                feed_dict={self.ac_seq: soln[None]}
-            )
-            pred_cost, pred_traj = pred_cost[0], pred_traj[:, 0]
-            if self.log_particles:
-                self.pred_particles.append(pred_traj)
-                self.pred_actions.append(soln)
-            else:
-                self.pred_means.append(np.mean(pred_traj, axis=1))
-                self.pred_vars.append(np.mean(np.square(pred_traj - self.pred_means[-1]), axis=1))
-            if get_pred_cost:
-                return self.act(obs, t), pred_cost
-        return self.act(obs, t)
+                self.sy_cur_obs.load(obs, self.model.sess)
+
+            soln = self.optimizer.obtain_solution(t, self.prev_sol, self.init_var)
+            self.prev_sol = np.concatenate([np.copy(soln)[self.per*self.dU:], np.zeros(self.per*self.dU)])
+            self.ac_buf = soln[:self.per*self.dU].reshape(-1, self.dU)
+
+            if get_pred_cost and not (self.log_traj_preds or self.log_particles):
+                if self.model.is_tf_model:
+                    pred_cost = self.model.sess.run(
+                        self.pred_cost,
+                        feed_dict={
+                            self.time_in_episode_ph: t,
+                            self.ac_seq: soln[None]
+                        }
+                    )[0]
+                else:
+                    raise NotImplementedError()
+                # action = self.act(obs, t, get_pred_cost=False)
+            elif self.log_traj_preds or self.log_particles:
+                pred_cost, pred_traj = self.model.sess.run(
+                    [self.pred_cost, self.pred_traj],
+                    feed_dict={
+                        self.time_in_episode_ph: t,
+                        self.ac_seq: soln[None],
+                    }
+                )
+                pred_cost, pred_traj = pred_cost[0], pred_traj[:, 0]
+                if self.log_particles:
+                    self.pred_particles.append(pred_traj)
+                    self.pred_actions.append(soln)
+                else:
+                    self.pred_means.append(np.mean(pred_traj, axis=1))
+                    self.pred_vars.append(np.mean(np.square(pred_traj - self.pred_means[-1]), axis=1))
+                # action = self.act(obs, t, get_pred_cost=False)
+                # if get_pred_cost:
+                #     return self.act(obs, t), pred_cost
+            action = self.act(obs, t, get_pred_cost=False)
+
+        if get_pred_cost:
+            return action, pred_cost
+        else:
+            return action
 
     def dump_logs(self, primary_logdir, iter_logdir):
         """Saves logs to either a primary log directory or another iteration-specific directory.
@@ -269,7 +286,7 @@ class MPC(Controller):
             )
             self.pred_means, self.pred_vars = [], []
 
-    def _compile_cost(self, ac_seqs, get_pred_trajs=False):
+    def _compile_cost(self, time_in_episode, ac_seqs, get_pred_trajs=False):
         t, nopt = tf.constant(0), tf.shape(ac_seqs)[0]
         init_costs = tf.zeros([nopt, self.npart])
         ac_seqs = tf.reshape(ac_seqs, [-1, self.plan_hor, self.dU])
@@ -279,13 +296,16 @@ class MPC(Controller):
         ), [self.plan_hor, -1, self.dU])
         init_obs = tf.tile(self.sy_cur_obs[None], [nopt * self.npart, 1])
 
-        def continue_prediction(t, *args):
-            return tf.less(t, self.plan_hor)
+        def continue_prediction(t, time_in_episode, *args):
+            return tf.logical_and(
+                tf.less(time_in_episode, self.task_hor),
+                tf.less(t, self.plan_hor),
+            )
 
         if get_pred_trajs:
             pred_trajs = init_obs[None]
 
-            def iteration(t, total_cost, cur_obs, pred_trajs):
+            def iteration(t, time_in_episode, total_cost, cur_obs, pred_trajs):
                 cur_acs = ac_seqs[t]
                 next_obs = self._predict_next_obs(cur_obs, cur_acs)
                 delta_cost = tf.reshape(
@@ -293,12 +313,21 @@ class MPC(Controller):
                 )
                 next_obs = self.obs_postproc2(next_obs)
                 pred_trajs = tf.concat([pred_trajs, next_obs[None]], axis=0)
-                return t + 1, total_cost + delta_cost, next_obs, pred_trajs
+                return t + 1, time_in_episode, delta_cost, \
+                       next_obs, pred_trajs
 
-            _, costs, _, pred_trajs = tf.while_loop(
-                cond=continue_prediction, body=iteration, loop_vars=[t, init_costs, init_obs, pred_trajs],
+            _, _, costs, _, pred_trajs = tf.while_loop(
+                cond=continue_prediction,
+                body=iteration,
+                loop_vars=[
+                    t, time_in_episode, init_costs, init_obs, pred_trajs
+                ],
                 shape_invariants=[
-                    t.get_shape(), init_costs.get_shape(), init_obs.get_shape(), tf.TensorShape([None, None, self.dO])
+                    t.get_shape(),
+                    time_in_episode.get_shape(),
+                    init_costs.get_shape(),
+                    init_obs.get_shape(),
+                    tf.TensorShape([None, None, self.dO])
                 ]
             )
 
@@ -307,16 +336,19 @@ class MPC(Controller):
             pred_trajs = tf.reshape(pred_trajs, [self.plan_hor + 1, -1, self.npart, self.dO])
             return costs, pred_trajs
         else:
-            def iteration(t, total_cost, cur_obs):
+            def iteration(t, time_in_episode, total_cost, cur_obs):
                 cur_acs = ac_seqs[t]
                 next_obs = self._predict_next_obs(cur_obs, cur_acs)
                 delta_cost = tf.reshape(
                     self.obs_cost_fn(next_obs) + self.ac_cost_fn(cur_acs), [-1, self.npart]
                 )
-                return t + 1, total_cost + delta_cost, self.obs_postproc2(next_obs)
+                return t + 1, time_in_episode, delta_cost, self.obs_postproc2(
+                    next_obs)
 
-            _, costs, _ = tf.while_loop(
-                cond=continue_prediction, body=iteration, loop_vars=[t, init_costs, init_obs]
+            _, _, costs, _ = tf.while_loop(
+                cond=continue_prediction,
+                body=iteration,
+                loop_vars=[t, time_in_episode, init_costs, init_obs]
             )
 
             # Replace nan costs with very high cost

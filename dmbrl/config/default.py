@@ -47,6 +47,7 @@ def create_config(env_name, ctrl_type, ctrl_args, overrides, logdir,
             ),
             opt_cfg=DotMap(
                 plan_hor=int,
+                task_hor=int,
             ),
             log_cfg=DotMap(
                 save_all_models=make_bool,
