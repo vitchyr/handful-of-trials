@@ -103,6 +103,7 @@ class MPC(Controller):
         self.task_hor = get_required_argument(params.opt_cfg, "task_hor", "Must provide task horizon.")
         self.obs_cost_fn = get_required_argument(params.opt_cfg, "obs_cost_fn", "Must provide cost on observations.")
         self.ac_cost_fn = get_required_argument(params.opt_cfg, "ac_cost_fn", "Must provide cost on actions.")
+        self.init_var_scale = params.opt_cfg.get("init_var_scale", 1.)
 
         self.save_all_models = params.log_cfg.get("save_all_models", False)
         self.log_traj_preds = params.log_cfg.get("log_traj_preds", False)
@@ -130,7 +131,9 @@ class MPC(Controller):
         self.has_been_trained = params.prop_cfg.get("model_pretrained", False)
         self.ac_buf = np.array([]).reshape(0, self.dU)
         self.prev_sol = np.tile((self.ac_lb + self.ac_ub) / 2, [self.plan_hor])
-        self.init_var = np.tile(np.square(self.ac_ub - self.ac_lb) / 16, [self.plan_hor])
+        self.init_var = np.tile(
+            np.square(self.ac_ub - self.ac_lb) / 16, [self.plan_hor]
+        ) * self.init_var_scale
         self.train_in = np.array([]).reshape(0, self.dU + self.obs_preproc(np.zeros([1, self.dO])).shape[-1])
         self.train_targs = np.array([]).reshape(
             0, self.targ_proc(np.zeros([1, self.dO]), np.zeros([1, self.dO])).shape[-1]

@@ -27,11 +27,11 @@ def exp(steps_needed_to_solve, planning_horizon, logdir):
         ["exp_cfg.log_cfg.nrecord", 1],
         ["exp_cfg.log_cfg.neval", 5],
         ["exp_cfg.log_cfg.nrecord_eval_mode", 1],
-        ["exp_cfg.log_cfg.neval_eval_mode", 5],
+        ["exp_cfg.log_cfg.neval_eval_mode", 3],
         # ["exp_cfg.log_cfg.nrecord", 2],
         # ["exp_cfg.log_cfg.neval", 5],
         # ["exp_cfg.log_cfg.neval_eval_mode", 5],
-        # ["exp_cfg.exp_cfg.ntrain_iters", 3],
+        ["exp_cfg.exp_cfg.ntrain_iters", 200],
         # ["ctrl_cfg.opt_cfg.plan_hor", 1],
         # ["ctrl_cfg.opt_cfg.cfg.popsize", 5],
         # ["ctrl_cfg.opt_cfg.cfg.num_elites", 2],
@@ -39,6 +39,7 @@ def exp(steps_needed_to_solve, planning_horizon, logdir):
         ["ctrl_cfg.opt_cfg.cfg.popsize", "200"],
         ["ctrl_cfg.opt_cfg.cfg.num_elites", "20"],
         ["ctrl_cfg.opt_cfg.cfg.max_iters", "5"],
+        ["ctrl_cfg.opt_cfg.init_var_scale", "4."],
     ]
     config_module_kwargs = {
         'steps_needed_to_solve': steps_needed_to_solve,
@@ -65,6 +66,7 @@ def exp(steps_needed_to_solve, planning_horizon, logdir):
         json.dump(config_dict, f, indent=2, sort_keys=True, cls=MyEncoder)
     save_git_info(exp.logdir)
 
+    logger.reset()
     logger.set_snapshot_dir(exp.logdir)
     logger.add_tabular_output(os.path.join(exp.logdir, 'progress.csv'))
     logger.log_variant(os.path.join(exp.logdir, 'variant.json'), config_dict)
@@ -81,7 +83,7 @@ if __name__ == "__main__":
                         help='Directory to which results will be logged (default: ./log)')
     args = parser.parse_args()
     # exp(8, 3, args.logdir)
-    for planning_H in [4, 8, 16, 20]:
+    for planning_H in [4, 8, 16]:
         exp(4, planning_H, args.logdir)
     # for planning_H in [4, 8, 16, 20]:
     #     exp(8, planning_H, args.logdir)

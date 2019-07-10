@@ -48,6 +48,7 @@ def create_config(env_name, ctrl_type, ctrl_args, overrides, logdir,
             opt_cfg=DotMap(
                 plan_hor=int,
                 task_hor=int,
+                init_var_scale=float,
             ),
             log_cfg=DotMap(
                 save_all_models=make_bool,
@@ -171,7 +172,7 @@ def _create_ctrl_config(ctrl_cfg, cfg_module, ctrl_type, ctrl_args, type_map):
                 popsize=int,
                 num_elites=int,
                 epsilon=float,
-                alpha=float
+                alpha=float,
             )
         elif ctrl_cfg.opt_cfg.mode == "Random":
             type_map.ctrl_cfg.opt_cfg.cfg = DotMap(

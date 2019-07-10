@@ -20,7 +20,7 @@ class PointmassUWallConfigModule(PointmassBaseConfigModule):
     PLAN_HOR = 10
     MODEL_IN, MODEL_OUT = 6, 4
     GP_NINDUCING_POINTS = 200
-    PATH_LENGTH_TO_SOLVE = 16.
+    PATH_LENGTH_TO_SOLVE = 20.
 
     def __init__(self, steps_needed_to_solve, planning_horizon,
                  task_horizon_factor=2):
