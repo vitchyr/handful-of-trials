@@ -85,8 +85,8 @@ class Agent:
             recorder.capture_frame()
             recorder.close()
 
-        print("Average action selection time: ", np.mean(times))
-        print("Rollout length: ", len(A))
+        # print("Average action selection time: ", np.mean(times))
+        # print("Rollout length: ", len(A))
 
         return {
             "obs": np.array(O),

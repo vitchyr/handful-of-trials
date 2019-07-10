@@ -84,7 +84,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     # exp(8, 3, args.logdir)
     for planning_H in [4, 8, 16]:
-        exp(4, planning_H, args.logdir)
+        exp(5, planning_H, args.logdir)
     # for planning_H in [4, 8, 16, 20]:
     #     exp(8, planning_H, args.logdir)
 
