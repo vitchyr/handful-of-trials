@@ -73,7 +73,6 @@ class Agent:
                 action = A[t] + np.random.normal(loc=0, scale=self.noise_stddev, size=[self.dU])
                 action = np.minimum(np.maximum(action, self.env.action_space.low), self.env.action_space.high)
             obs, reward, done, info = self.env.step(action)
-            self.env.render()
             # print("obs {} action {} at time {}".format(obs, action, t))
             O.append(obs)
             env_infos.append(info)
