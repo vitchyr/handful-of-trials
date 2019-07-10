@@ -55,11 +55,12 @@ class Agent:
         agent_infos = []
 
         policy.reset()
+        # print("init obs {}".format(O[0]))
         for t in range(horizon):
             if video_record:
                 recorder.capture_frame()
             start = time.time()
-            action, predicted_cost = policy.act(O[t], t)
+            action, predicted_cost = policy.act(O[t], t, get_pred_cost=True)
             A.append(action)
             agent_infos.append({
                 'predicted_cost': predicted_cost
@@ -67,11 +68,12 @@ class Agent:
             times.append(time.time() - start)
 
             if self.noise_stddev is None:
-                obs, reward, done, info = self.env.step(A[t])
+                action = A[t]
             else:
                 action = A[t] + np.random.normal(loc=0, scale=self.noise_stddev, size=[self.dU])
                 action = np.minimum(np.maximum(action, self.env.action_space.low), self.env.action_space.high)
-                obs, reward, done, info = self.env.step(action)
+            obs, reward, done, info = self.env.step(action)
+            # print("obs {} action {} at time {}".format(obs, action, t))
             O.append(obs)
             env_infos.append(info)
             reward_sum += reward
