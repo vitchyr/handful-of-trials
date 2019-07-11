@@ -31,24 +31,25 @@ def main(
         ["exp_cfg.sim_cfg.task_hor", "12"],
         ["exp_cfg.exp_cfg.ninit_rollouts", "0"],
         ["exp_cfg.exp_cfg.ntrain_iters", "1"],
-        ["exp_cfg.exp_cfg.nrollouts_per_iter", "1"],
-        ["exp_cfg.log_cfg.nrecord", "1"],
-        ["exp_cfg.log_cfg.neval", "1"],
-        # ["exp_cfg.exp_cfg.nrollouts_per_iter", "0"],
-        # ["exp_cfg.log_cfg.nrecord", "0"],
-        # ["exp_cfg.log_cfg.neval", "0"],
-        ["exp_cfg.log_cfg.nrecord_eval_mode", "0"],
-        ["exp_cfg.log_cfg.neval_eval_mode", "0"],
-        # ["exp_cfg.log_cfg.nrecord_eval_mode", "1"],
-        # ["exp_cfg.log_cfg.neval_eval_mode", "1"],
+        # ["exp_cfg.exp_cfg.nrollouts_per_iter", "1"],
+        # ["exp_cfg.log_cfg.nrecord", "1"],
+        # ["exp_cfg.log_cfg.neval", "1"],
+        ["exp_cfg.exp_cfg.nrollouts_per_iter", "0"],
+        ["exp_cfg.log_cfg.nrecord", "0"],
+        ["exp_cfg.log_cfg.neval", "0"],
+        # ["exp_cfg.log_cfg.nrecord_eval_mode", "0"],
+        # ["exp_cfg.log_cfg.neval_eval_mode", "0"],
+        ["exp_cfg.log_cfg.nrecord_eval_mode", "1"],
+        ["exp_cfg.log_cfg.neval_eval_mode", "1"],
         ["ctrl_cfg.per", "5"],
-        ["ctrl_cfg.opt_cfg.cfg.popsize", "200"],
-        ["ctrl_cfg.opt_cfg.cfg.num_elites", "20"],
-        ["ctrl_cfg.opt_cfg.cfg.max_iters", "5"],
-        # ["ctrl_cfg.opt_cfg.cfg.popsize", "4"],
+        ["ctrl_cfg.opt_cfg.cfg.popsize", "4000"],
+        ["ctrl_cfg.opt_cfg.cfg.num_elites", "200"],
+        ["ctrl_cfg.opt_cfg.cfg.max_iters", "15"],
+        ["ctrl_cfg.opt_cfg.cfg.alpha", "0"],
+        # ["ctrl_cfg.opt_cfg.cfg.popsize", "4"e],
         # ["ctrl_cfg.opt_cfg.cfg.num_elites", "4"],
         # ["ctrl_cfg.opt_cfg.cfg.max_iters", "5"],
-        ["ctrl_cfg.opt_cfg.plan_hor", "8"],
+        ["ctrl_cfg.opt_cfg.plan_hor", "7"],
         ["ctrl_cfg.log_cfg.log_particles", "True"],
         ["ctrl_cfg.log_cfg.log_traj_preds", "True"],
     ]
@@ -129,8 +130,7 @@ if __name__ == "__main__":
     parser.add_argument('-nrecord', type=int, default=1)
     parser.add_argument('-no-raw-dir', action='store_true')
     args = parser.parse_args()
-    base_dir = "/home/vitchyr/git/handful-of-trials/log/pointmass-u-wall" \
-               "-solve-in-4-sweep-log-railrl-style/2019-07-03--12:02:51/"
+    base_dir = "/home/vitchyr/git/handful-of-trials/log/point-uwall-sweep-after-terminal-cost-fix-2/2019-07-10--15:49:40/"
 
     main(
         env="pointmass_u_wall",
