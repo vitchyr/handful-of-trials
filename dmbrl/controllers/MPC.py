@@ -195,6 +195,15 @@ class MPC(Controller):
         Returns: None
         """
         self.prev_sol = np.tile((self.ac_lb + self.ac_ub) / 2, [self.plan_hor])
+        # self.prev_sol = np.array([
+        #     0, -1,
+        #     1, 0,
+        #     1, 0,
+        #     0, 1,
+        #     0, 1,
+        #     -1, -0.5,
+        #     0, 0,
+        # ])
         self.optimizer.reset()
         if self.model.is_tf_model:
             for update_fn in self.update_fns:
@@ -256,6 +265,7 @@ class MPC(Controller):
                 #     return self.act(obs, t), pred_cost
             action = self.act(obs, t, get_pred_cost=False)
 
+        self.prev_pred_cost = pred_cost
         if get_pred_cost:
             return action, pred_cost
         else:
@@ -300,10 +310,7 @@ class MPC(Controller):
         init_obs = tf.tile(self.sy_cur_obs[None], [nopt * self.npart, 1])
 
         def continue_prediction(t, time_in_episode, *args):
-            return tf.logical_and(
-                tf.less(time_in_episode, self.task_hor),
-                tf.less(t, self.plan_hor),
-            )
+            return tf.less(t, self.plan_hor)
 
         if get_pred_trajs:
             pred_trajs = init_obs[None]
@@ -316,8 +323,12 @@ class MPC(Controller):
                 )
                 next_obs = self.obs_postproc2(next_obs)
                 pred_trajs = tf.concat([pred_trajs, next_obs[None]], axis=0)
-                return t + 1, time_in_episode, delta_cost, \
-                       next_obs, pred_trajs
+                new_cost = tf.cond(
+                    t+time_in_episode < self.task_hor,
+                    lambda: delta_cost,
+                    lambda: total_cost,
+                )
+                return t + 1, time_in_episode, new_cost, next_obs, pred_trajs
 
             _, _, costs, _, pred_trajs = tf.while_loop(
                 cond=continue_prediction,
@@ -345,8 +356,12 @@ class MPC(Controller):
                 delta_cost = tf.reshape(
                     self.obs_cost_fn(next_obs) + self.ac_cost_fn(cur_acs), [-1, self.npart]
                 )
-                return t + 1, time_in_episode, delta_cost, self.obs_postproc2(
-                    next_obs)
+                new_cost = tf.cond(
+                    t+time_in_episode < self.task_hor,
+                    lambda: delta_cost,
+                    lambda: total_cost,
+                )
+                return t + 1, time_in_episode, new_cost, self.obs_postproc2(next_obs)
 
             _, _, costs, _ = tf.while_loop(
                 cond=continue_prediction,
