@@ -195,15 +195,15 @@ class MPC(Controller):
         Returns: None
         """
         self.prev_sol = np.tile((self.ac_lb + self.ac_ub) / 2, [self.plan_hor])
-        # self.prev_sol = np.array([
-        #     0, -1,
-        #     1, 0,
-        #     1, 0,
-        #     0, 1,
-        #     0, 1,
-        #     -1, -0.5,
-        #     0, 0,
-        # ])
+        self.prev_sol = np.array([
+            0, -1,
+            1, 0,
+            # 1, 0,
+            0, 1,
+            0, 1,
+            -1, -0.5,
+            # 0, 0,
+        ])
         self.optimizer.reset()
         if self.model.is_tf_model:
             for update_fn in self.update_fns:
@@ -229,7 +229,7 @@ class MPC(Controller):
             if self.model.is_tf_model:
                 self.sy_cur_obs.load(obs, self.model.sess)
 
-            soln = self.optimizer.obtain_solution(t, self.prev_sol, self.init_var)
+            soln, solnvar = self.optimizer.obtain_solution(t, self.prev_sol, self.init_var)
             self.prev_sol = np.concatenate([np.copy(soln)[self.per*self.dU:], np.zeros(self.per*self.dU)])
             self.ac_buf = soln[:self.per*self.dU].reshape(-1, self.dU)
 

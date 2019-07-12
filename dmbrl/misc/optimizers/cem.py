@@ -142,4 +142,4 @@ class CEMOptimizer(Optimizer):
 
                 t += 1
             sol, solvar = mean, var
-        return sol
+        return sol, solvar
