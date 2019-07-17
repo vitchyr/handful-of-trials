@@ -158,20 +158,18 @@ class MBExperiment:
                     )
                 )
                 self.env.mode = 'exploration'
+
             print("Rewards obtained:", [sample["reward_sum"] for sample in samples[:self.neval]])
-            traj_obs.extend([sample["obs"] for sample in samples[:self.nrollouts_per_iter]])
-            traj_acs.extend([sample["ac"] for sample in samples[:self.nrollouts_per_iter]])
-            traj_rets.extend([sample["reward_sum"] for sample in samples[:self.neval]])
-            traj_rews.extend([sample["rewards"] for sample in samples[:self.nrollouts_per_iter]])
+            traj_obs.extend([sample["obs"] for sample in samples])
+            traj_acs.extend([sample["ac"] for sample in samples])
+            traj_rets.extend([sample["reward_sum"] for sample in samples])
+            traj_rews.extend([sample["rewards"] for sample in samples])
 
-            print("Eval rewards obtained:", [sample["reward_sum"] for sample in eval_samples[:self.neval]])
-            eval_traj_obs.extend([sample["obs"] for sample in eval_samples[:self.nrollouts_per_iter]])
-            eval_traj_acs.extend([sample["ac"] for sample in eval_samples[:self.nrollouts_per_iter]])
-            eval_traj_rets.extend([sample["reward_sum"] for sample in eval_samples[:self.neval]])
-            eval_traj_rews.extend([sample["rewards"] for sample in eval_samples[:self.nrollouts_per_iter]])
-
-            samples = samples[:self.nrollouts_per_iter]
-            eval_samples = eval_samples[:self.neval_eval_mode]
+            print("Eval rewards obtained:", [sample["reward_sum"] for sample in eval_samples])
+            eval_traj_obs.extend([sample["obs"] for sample in eval_samples])
+            eval_traj_acs.extend([sample["ac"] for sample in eval_samples])
+            eval_traj_rets.extend([sample["reward_sum"] for sample in eval_samples])
+            eval_traj_rews.extend([sample["rewards"] for sample in eval_samples])
 
             self.policy.dump_logs(self.logdir, iter_dir)
             stats_to_save = {
