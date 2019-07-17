@@ -24,7 +24,9 @@ class PointmassBaseConfigModule(object):
     # MODEL_IN, MODEL_OUT = ?, ?
 
     def __init__(self):
-        cfg = tf.ConfigProto(log_device_placement=True)
+        cfg = tf.ConfigProto(
+            log_device_placement=True,
+        )
         cfg.gpu_options.allow_growth = True
         self.SESS = tf.Session(config=cfg)
         self.NN_TRAIN_CFG = {"epochs": 5}
@@ -67,10 +69,14 @@ class PointmassBaseConfigModule(object):
             #     tf.square(obs[:, :2] - obs[:, 2:]),
             #     axis=1,
             # ))
-            return tf.reduce_sum(
-                tf.square(obs[:, :2] - obs[:, 2:]),
+            return tf.norm(
+                obs[:, :2] - obs[:, 2:],
                 axis=1,
             )
+            # return tf.reduce_sum(
+            #     tf.square(obs[:, :2] - obs[:, 2:]),
+            #     axis=1,
+            # )
 
     @staticmethod
     def ac_cost_fn(acs):
