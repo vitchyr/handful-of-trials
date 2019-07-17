@@ -160,6 +160,7 @@ class MPC(Controller):
             print("Controller is logging particle predictions (Note: This may be memory-intensive).")
             self.pred_particles = []
             self.pred_actions = []
+            self.pred_costs = []
         elif self.log_traj_preds:
             print("Controller is logging trajectory prediction statistics (mean+var).")
             self.pred_means, self.pred_vars = [], []
@@ -195,15 +196,15 @@ class MPC(Controller):
         Returns: None
         """
         self.prev_sol = np.tile((self.ac_lb + self.ac_ub) / 2, [self.plan_hor])
-        self.prev_sol = np.array([
-            0, -1,
-            1, 0,
-            # 1, 0,
-            0, 1,
-            0, 1,
-            -1, -0.5,
-            # 0, 0,
-        ])
+        # self.prev_sol = np.array([
+        #     0, -1,
+        #     1, 0,
+        #     # 1, 0,
+        #     0, 1,
+        #     0, 1,
+        #     -1, -0.5,
+        #     # 0, 0,
+        # ])
         self.optimizer.reset()
         if self.model.is_tf_model:
             for update_fn in self.update_fns:
@@ -257,6 +258,7 @@ class MPC(Controller):
                 if self.log_particles:
                     self.pred_particles.append(pred_traj)
                     self.pred_actions.append(soln)
+                    self.pred_costs.append(pred_cost)
                 else:
                     self.pred_means.append(np.mean(pred_traj, axis=1))
                     self.pred_vars.append(np.mean(np.square(pred_traj - self.pred_means[-1]), axis=1))
@@ -288,7 +290,7 @@ class MPC(Controller):
             savemat(os.path.join(iter_logdir, "predictions.mat"), {
                 "predictions": self.pred_particles,
                 "actions": self.pred_actions,
-
+                "pred_costs": self.pred_costs,
             })
             self.pred_particles = []
             self.pred_actions = []
