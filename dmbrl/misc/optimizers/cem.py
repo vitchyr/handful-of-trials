@@ -75,7 +75,27 @@ class CEMOptimizer(Optimizer):
             def iteration(t, time_in_episode, mean, var, best_val, best_sol):
                 lb_dist, ub_dist = mean - self.lb, self.ub - mean
                 constrained_var = tf.minimum(tf.minimum(tf.square(lb_dist / 2), tf.square(ub_dist / 2)), var)
-                samples = tf.truncated_normal([self.popsize, self.sol_dim], mean, tf.sqrt(constrained_var))
+                gaussian_samples = tf.truncated_normal(
+                    [self.popsize, self.sol_dim],
+                    mean,
+                    tf.sqrt(constrained_var),
+                )
+                uniform_samples = tf.random_uniform(
+                    [self.popsize, self.sol_dim],
+                    minval=-1,
+                    maxval=1,
+                )
+                samples = tf.cond(
+                    tf.equal(t, 0),
+                    lambda: uniform_samples,
+                    lambda: gaussian_samples,
+                )
+                # samples = tf.random.categorical(tf.math.log([[10., 10., 10.]]),
+                #                                 self.popsize*self.sol_dim)
+                # samples = tf.reshape(samples, [self.popsize, self.sol_dim])  - 1
+                # samples = tf.cast(samples, tf.float32)
+                # samples = tf.truncated_normal([self.popsize, self.sol_dim], mean, var)
+                # samples = tf.random_uniform([self.popsize, self.sol_dim], minval=-1, maxval=1)
 
                 costs = cost_function(time_in_episode, samples)
                 values, indices = tf.nn.top_k(-costs, k=self.num_elites, sorted=True)
