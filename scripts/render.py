@@ -29,10 +29,24 @@ def main(
     overrides.append(["exp_cfg.exp_cfg.ninit_rollouts", "0"])
     overrides.append(["exp_cfg.exp_cfg.init_iter", str(init_iter)])
     overrides.append(["exp_cfg.exp_cfg.ntrain_iters", str(last_iter)])
-    overrides.append(["exp_cfg.log_cfg.nrecord", str(nrecord)])
+    # overrides.append(["exp_cfg.log_cfg.nrecord", str(nrecord)])
     overrides.append(["exp_cfg.log_cfg.rawdir", str(rawdir)])
+    overrides += [
+        ["exp_cfg.log_cfg.nrecord", 1],
+        ["exp_cfg.log_cfg.neval", 1],
+        ["exp_cfg.log_cfg.nrecord_eval_mode", 1],
+        ["exp_cfg.log_cfg.neval_eval_mode", 1],
+    ]
 
-    cfg = create_config(env, ctrl_type, ctrl_args, overrides, logdir)
+    config_module_kwargs = {
+        'steps_needed_to_solve': 5,
+        'planning_horizon': 5,
+        'task_horizon_factor': 4,
+    }
+    cfg = create_config(env, ctrl_type, ctrl_args, overrides, logdir,
+        config_module_kwargs)
+    # HACK
+    cfg.ctrl_cfg.opt_cfg.task_hor = cfg.exp_cfg.sim_cfg.task_hor
     cfg.pprint()
 
     if ctrl_type == "MPC":

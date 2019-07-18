@@ -9,7 +9,7 @@ import pprint
 
 from dotmap import DotMap
 
-from dmbrl.logging import logger
+from easy_logger import logger
 from dmbrl.misc.MBExp import MBExperiment
 from dmbrl.controllers.MPC import MPC
 from dmbrl.config import create_config
@@ -39,7 +39,7 @@ def exp(steps_needed_to_solve, planning_horizon, logdir):
         ["ctrl_cfg.opt_cfg.cfg.popsize", "200"],
         ["ctrl_cfg.opt_cfg.cfg.num_elites", "20"],
         ["ctrl_cfg.opt_cfg.cfg.max_iters", "5"],
-        ["ctrl_cfg.opt_cfg.init_var_scale", "4."],
+        # ["ctrl_cfg.opt_cfg.init_var_scale", "4."],
     ]
     config_module_kwargs = {
         'steps_needed_to_solve': steps_needed_to_solve,
@@ -82,9 +82,12 @@ if __name__ == "__main__":
     parser.add_argument('-logdir', type=str, default='log/test',
                         help='Directory to which results will be logged (default: ./log)')
     args = parser.parse_args()
-    # exp(8, 3, args.logdir)
-    for planning_H in [4, 8, 16]:
-        exp(5, planning_H, args.logdir)
+    exp(10, 10, args.logdir)
+    exp(15, 15, args.logdir)
+    exp(20, 20, args.logdir)
+    # exp(5, 5, args.logdir)
+    # for planning_H in [4, 8, 16]:
+    #     exp(5, planning_H, args.logdir)
     # for planning_H in [4, 8, 16, 20]:
     #     exp(8, planning_H, args.logdir)
 

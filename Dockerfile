@@ -36,4 +36,6 @@ RUN cd ~ && git clone https://github.com/kchua/handful-of-trials.git
 RUN echo 'LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu' >> /root/.bashrc
 RUN echo 'alias python=python3' >> /root/.bashrc
 
+RUN pip3 install cloudpickle==0.5.2
+
 CMD /bin/bash
