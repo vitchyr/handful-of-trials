@@ -339,7 +339,7 @@ class BNN:
             return mean, variance
         return factored_mean, factored_variance
 
-    def save(self, savedir=None):
+    def save(self, savedir=None, iteration=None):
         """Saves all information required to recreate this model in two files in savedir
         (or self.model_dir if savedir is None), one containing the model structuure and the other
         containing all variables in the network.
@@ -351,8 +351,12 @@ class BNN:
             raise RuntimeError()
         model_dir = self.model_dir if savedir is None else savedir
 
+        if iteration is not None:
+            name = self.name + "_{}".format(iteration)
+        else:
+            name = self.name
         # Write structure to file
-        with open(os.path.join(model_dir, "%s.nns" % self.name), "w+") as f:
+        with open(os.path.join(model_dir, "%s.nns" % name), "w+") as f:
             for layer in self.layers[:-1]:
                 f.write("%s\n" % repr(layer))
             last_layer_copy = self.layers[-1].copy()
@@ -364,7 +368,7 @@ class BNN:
         var_vals = {}
         for i, var_val in enumerate(self.sess.run(self.nonoptvars + self.optvars)):
             var_vals[str(i)] = var_val
-        savemat(os.path.join(model_dir, "%s.mat" % self.name), var_vals)
+        savemat(os.path.join(model_dir, "%s.mat" % name), var_vals)
 
     def _load_structure(self):
         """Uses the saved structure in self.model_dir with the name of this network to initialize

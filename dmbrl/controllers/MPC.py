@@ -6,6 +6,7 @@ import os
 
 import tensorflow as tf
 import numpy as np
+from easy_logger import logger
 from scipy.io import savemat
 
 from .Controller import Controller
@@ -273,7 +274,7 @@ class MPC(Controller):
         else:
             return action
 
-    def dump_logs(self, primary_logdir, iter_logdir):
+    def dump_logs(self, primary_logdir, iter_logdir, iteration):
         """Saves logs to either a primary log directory or another iteration-specific directory.
         See __init__ documentation to see what is being logged.
 
@@ -285,6 +286,10 @@ class MPC(Controller):
 
         Returns: None
         """
+        log_mode = logger.get_snapshot_mode()
+        if log_mode in {'gap', 'gap_and_last'}:
+            if iteration % logger.get_snapshot_gap() == 0:
+                self.model.save(primary_logdir, iteration=iteration)
         self.model.save(iter_logdir if self.save_all_models else primary_logdir)
         if self.log_particles:
             savemat(os.path.join(iter_logdir, "predictions.mat"), {

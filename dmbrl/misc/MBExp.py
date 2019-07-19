@@ -171,7 +171,7 @@ class MBExperiment:
             eval_traj_rets.extend([sample["reward_sum"] for sample in eval_samples])
             eval_traj_rews.extend([sample["rewards"] for sample in eval_samples])
 
-            self.policy.dump_logs(self.logdir, iter_dir)
+            self.policy.dump_logs(self.logdir, iter_dir, i)
             stats_to_save = {
                 "observations": traj_obs,
                 "actions": traj_acs,
