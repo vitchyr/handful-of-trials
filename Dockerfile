@@ -37,5 +37,10 @@ RUN echo 'LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu' >> /root/.
 RUN echo 'alias python=python3' >> /root/.bashrc
 
 RUN pip3 install cloudpickle==0.5.2
+RUN pip3 install tensorflow==1.14
+RUN pip3 install decorator==4.4.0
+RUN pip3 install pygame==1.9.6
+RUN pip3 install ipdb==0.12
+RUN apt-get -y install ffmpeg
 
 CMD /bin/bash

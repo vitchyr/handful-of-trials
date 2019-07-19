@@ -14,8 +14,8 @@ def test(variant):
 
 run_experiment(
     test,
-    exp_prefix='generate_pets_ami',
-    mode='ec2',
+    # exp_prefix='generate_pets_ami',
+    mode='local_docker',
     variant=dict(
         a=123,
     ),
