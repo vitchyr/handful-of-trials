@@ -134,8 +134,8 @@ class CEMOptimizer(Optimizer):
             init_var (np.ndarray): The variance of the initial candidate distribution.
         """
         if self.tf_compatible:
-            sol, solvar = self.tf_sess.run(
-                [self.mean, self.var],
+            sol, solvar, best_val, best_sol = self.tf_sess.run(
+                [self.mean, self.var, self.best_val, self.best_sol],
                 feed_dict={
                     self.time_in_episode: time_in_episode,
                     self.init_mean: init_mean,
@@ -143,23 +143,5 @@ class CEMOptimizer(Optimizer):
                 }
             )
         else:
-            mean, var, t = init_mean, init_var, 0
-            X = stats.truncnorm(-2, 2, loc=np.zeros_like(mean), scale=np.ones_like(mean))
-
-            while (t < self.max_iters) and np.max(var) > self.epsilon:
-                lb_dist, ub_dist = mean - self.lb, self.ub - mean
-                constrained_var = np.minimum(np.minimum(np.square(lb_dist / 2), np.square(ub_dist / 2)), var)
-
-                samples = X.rvs(size=[self.popsize, self.sol_dim]) * np.sqrt(constrained_var) + mean
-                costs = self.cost_function(samples)
-                elites = samples[np.argsort(costs)][:self.num_elites]
-
-                new_mean = np.mean(elites, axis=0)
-                new_var = np.var(elites, axis=0)
-
-                mean = self.alpha * mean + (1 - self.alpha) * new_mean
-                var = self.alpha * var + (1 - self.alpha) * new_var
-
-                t += 1
-            sol, solvar = mean, var
-        return sol, solvar
+            raise NotImplementedError('TODO: best val and best sol')
+        return sol, solvar, best_val, best_sol

@@ -231,23 +231,24 @@ class MPC(Controller):
             if self.model.is_tf_model:
                 self.sy_cur_obs.load(obs, self.model.sess)
 
-            soln, solnvar = self.optimizer.obtain_solution(t, self.prev_sol, self.init_var)
+            soln, solnvar, pred_cost, _ = self.optimizer.obtain_solution(t,
+                                                                self.prev_sol, self.init_var)
             self.prev_sol = np.concatenate([np.copy(soln)[self.per*self.dU:], np.zeros(self.per*self.dU)])
             self.ac_buf = soln[:self.per*self.dU].reshape(-1, self.dU)
 
-            if get_pred_cost and not (self.log_traj_preds or self.log_particles):
-                if self.model.is_tf_model:
-                    pred_cost = self.model.sess.run(
-                        self.pred_cost,
-                        feed_dict={
-                            self.time_in_episode_ph: t,
-                            self.ac_seq: soln[None]
-                        }
-                    )[0]
-                else:
-                    raise NotImplementedError()
-                # action = self.act(obs, t, get_pred_cost=False)
-            elif self.log_traj_preds or self.log_particles:
+            # if get_pred_cost and not (self.log_traj_preds or self.log_particles):
+            #     if self.model.is_tf_model:
+            #         pred_cost = self.model.sess.run(
+            #             self.pred_cost,
+            #             feed_dict={
+            #                 self.time_in_episode_ph: t,
+            #                 self.ac_seq: soln[None]
+            #             }
+            #         )[0]
+            #     else:
+            #         raise NotImplementedError()
+            #     # action = self.act(obs, t, get_pred_cost=False)
+            if self.log_traj_preds or self.log_particles:
                 pred_cost, pred_traj = self.model.sess.run(
                     [self.pred_cost, self.pred_traj],
                     feed_dict={

@@ -26,6 +26,7 @@ def main(
     overrides.append(["ctrl_cfg.prop_cfg.model_init_cfg.model_dir", model_dir])
     overrides.append(["ctrl_cfg.prop_cfg.model_init_cfg.load_model", "True"])
     overrides.append(["ctrl_cfg.prop_cfg.model_pretrained", "True"])
+    # overrides.append(["ctrl_cfg.per", "5"])
     overrides.append(["exp_cfg.exp_cfg.ninit_rollouts", "0"])
     overrides.append(["exp_cfg.exp_cfg.init_iter", str(init_iter)])
     overrides.append(["exp_cfg.exp_cfg.ntrain_iters", str(last_iter)])

@@ -63,7 +63,7 @@ class Agent:
             action, predicted_cost = policy.act(O[t], t, get_pred_cost=True)
             A.append(action)
             agent_infos.append({
-                'predicted_cost': predicted_cost
+                'best_predicted_cost': predicted_cost
             })
             times.append(time.time() - start)
 
