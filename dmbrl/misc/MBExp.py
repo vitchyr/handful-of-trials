@@ -5,13 +5,14 @@ from __future__ import absolute_import
 import os
 from collections import OrderedDict
 
+from easy_logger import logger
+from easy_logger.logging import append_log
 from time import time, localtime, strftime
 
 import numpy as np
 from scipy.io import savemat
 from dotmap import DotMap
 
-from dmbrl.logging import logger, append_log
 from dmbrl.misc.DotmapUtils import get_required_argument
 from dmbrl.misc.Agent import Agent
 from dmbrl.util import get_generic_path_information

@@ -33,18 +33,14 @@ def exp(variant):
             ["exp_cfg.log_cfg.neval", 5],
             ["exp_cfg.log_cfg.nrecord_eval_mode", 1],
             ["exp_cfg.log_cfg.neval_eval_mode", 3],
-            # ["exp_cfg.log_cfg.nrecord", 2],
-            # ["exp_cfg.log_cfg.neval", 5],
-            # ["exp_cfg.log_cfg.neval_eval_mode", 5],
             ["exp_cfg.exp_cfg.ntrain_iters", 200],
-            # ["ctrl_cfg.opt_cfg.plan_hor", 1],
-            # ["ctrl_cfg.opt_cfg.cfg.popsize", 5],
-            # ["ctrl_cfg.opt_cfg.cfg.num_elites", 2],
-            # ["ctrl_cfg.opt_cfg.cfg.max_iters", 1],
             ["ctrl_cfg.opt_cfg.cfg.popsize", "200"],
             ["ctrl_cfg.opt_cfg.cfg.num_elites", "20"],
             ["ctrl_cfg.opt_cfg.cfg.max_iters", "5"],
-            # ["ctrl_cfg.opt_cfg.init_var_scale", "4."],
+            # ["exp_cfg.exp_cfg.ntrain_iters", 2],
+            # ["ctrl_cfg.opt_cfg.cfg.popsize", "2"],
+            # ["ctrl_cfg.opt_cfg.cfg.num_elites", "2"],
+            # ["ctrl_cfg.opt_cfg.cfg.max_iters", "1"],
         ],
         logdir=logger.get_snapshot_dir(),
         config_module_kwargs=config_module_kwargs,
@@ -83,8 +79,8 @@ def main():
     exp_prefix = 'pets-new-uwall-sweep'
 
     search_space = {
-        'steps_needed_to_solve': [5, 6, 7, 8]
-        # 'steps_needed_to_solve': [5, 6, 7, 8]
+        'steps_needed_to_solve': [5, 6, 7, 8],
+        # 'steps_needed_to_solve': [5],
     }
     sweeper = hyp.DeterministicHyperparameterSweeper(
         search_space,
@@ -101,7 +97,7 @@ def main():
                 variant=variant,
                 exp_id=exp_id,
                 snapshot_mode='gap_and_last',
-                snapshot_gap=1,
+                snapshot_gap=10,
                 use_gpu=True,
             )
 

@@ -8,8 +8,8 @@ import argparse
 import pprint
 
 from dotmap import DotMap
+from easy_logger import logger
 
-from dmbrl.logging import logger
 from dmbrl.misc.MBExp import MBExperiment
 from dmbrl.controllers.MPC import MPC
 from dmbrl.config import create_config
