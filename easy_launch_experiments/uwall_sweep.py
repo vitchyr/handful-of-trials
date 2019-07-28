@@ -33,7 +33,7 @@ def exp(variant):
             ["exp_cfg.log_cfg.neval", 5],
             ["exp_cfg.log_cfg.nrecord_eval_mode", 1],
             ["exp_cfg.log_cfg.neval_eval_mode", 3],
-            ["exp_cfg.exp_cfg.ntrain_iters", 200],
+            ["exp_cfg.exp_cfg.ntrain_iters", 500],
             ["ctrl_cfg.opt_cfg.cfg.popsize", "200"],
             ["ctrl_cfg.opt_cfg.cfg.num_elites", "20"],
             ["ctrl_cfg.opt_cfg.cfg.max_iters", "5"],
@@ -75,12 +75,12 @@ def main():
     exp_prefix = 'dev-time'
 
     n_seeds = 3
-    mode = 'ec2'
-    exp_prefix = 'pets-new-uwall-sweep'
+    mode = 'sss'
+    exp_prefix = 'neurips-rebut-pets-new-uwall-5-steps-sss'
 
     search_space = {
-        'steps_needed_to_solve': [5, 6, 7, 8],
-        # 'steps_needed_to_solve': [5],
+        # 'steps_needed_to_solve': [5, 10, 20],
+        'steps_needed_to_solve': [5],
     }
     sweeper = hyp.DeterministicHyperparameterSweeper(
         search_space,
@@ -97,7 +97,7 @@ def main():
                 variant=variant,
                 exp_id=exp_id,
                 snapshot_mode='gap_and_last',
-                snapshot_gap=10,
+                snapshot_gap=25,
                 use_gpu=True,
             )
 
