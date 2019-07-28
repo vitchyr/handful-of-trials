@@ -5,7 +5,7 @@ from __future__ import absolute_import
 import os
 from collections import OrderedDict
 
-from easy_logger import logger
+from easy_logger import logger, timer
 from easy_logger.logging import append_log
 from time import time, localtime, strftime
 
@@ -16,6 +16,17 @@ from dotmap import DotMap
 from dmbrl.misc.DotmapUtils import get_required_argument
 from dmbrl.misc.Agent import Agent
 from dmbrl.util import get_generic_path_information
+
+
+def _get_epoch_timings():
+    times_itrs = timer.get_times()
+    times = OrderedDict()
+    epoch_time = 0
+    for key in sorted(times_itrs):
+        time = times_itrs[key]
+        epoch_time += time
+        times['time/{} (s)'.format(key)] = time
+    return times
 
 
 class MBExperiment:
@@ -118,6 +129,7 @@ class MBExperiment:
 
         # Training loop
         for i in range(self.init_iter, self.ntrain_iters):
+            timer.reset()
             print("####################################################################")
             print("Starting training iteration %d." % (i + 1))
 
@@ -159,6 +171,7 @@ class MBExperiment:
                     )
                 )
                 self.env.mode = 'exploration'
+            timer.stamp('eval')
 
             print("Rewards obtained:", [sample["reward_sum"] for sample in samples[:self.neval]])
             traj_obs.extend([sample["obs"] for sample in samples])
@@ -173,6 +186,15 @@ class MBExperiment:
             eval_traj_rews.extend([sample["rewards"] for sample in eval_samples])
 
             self.policy.dump_logs(self.logdir, iter_dir, i)
+
+            if i < self.ntrain_iters - 1:
+                self.policy.train(
+                    [sample["obs"] for sample in samples],
+                    [sample["ac"] for sample in samples],
+                    [sample["rewards"] for sample in samples]
+                )
+            timer.stamp('train')
+
             stats_to_save = {
                 "observations": traj_obs,
                 "actions": traj_acs,
@@ -196,16 +218,11 @@ class MBExperiment:
                 get_generic_path_information(eval_samples),
                 prefix='eval/',
             )
+            timer.stamp('logging')
+            append_log(stats_to_log, _get_epoch_timings())
             for k, v in stats_to_log.items():
                 logger.record_tabular(k, v)
             logger.record_tabular('iteration', i)
             logger.dump_tabular()
             if len(os.listdir(iter_dir)) == 0:
                 os.rmdir(iter_dir)
-
-            if i < self.ntrain_iters - 1:
-                self.policy.train(
-                    [sample["obs"] for sample in samples],
-                    [sample["ac"] for sample in samples],
-                    [sample["rewards"] for sample in samples]
-                )
