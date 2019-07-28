@@ -90,6 +90,7 @@ class MBExperiment:
                 strftime("%Y-%m-%d--%H:%M:%S", localtime())
             )
         self.nrecord = params.log_cfg.get("nrecord", 0)
+        self.record_period = params.log_cfg.get("record_period", 1)
         self.neval = params.log_cfg.get("neval", 1)
         self.init_iter = params.exp_cfg.get("init_iter", 0)
         self.nrecord_eval_mode = params.log_cfg.get("nrecord_eval_mode", 0)
@@ -133,19 +134,30 @@ class MBExperiment:
             print("####################################################################")
             print("Starting training iteration %d." % (i + 1))
 
-            iter_dir = os.path.join(self.logdir, "train_iter%d" % (i + 1))
+            iter_dir = os.path.join(self.logdir, "train_iter%d" % i)
             os.makedirs(iter_dir, exist_ok=True)
 
             samples = []
             eval_samples = []
-            for j in range(self.nrecord):
+            if self.record_period > 1:
+                if i % self.record_period == 0:
+                    nrecord_this_iter = 1
+                    nrecord_eval_mode_this_iter = 1
+                else:
+                    nrecord_this_iter = 0
+                    nrecord_eval_mode_this_iter = 0
+            else:
+                nrecord_this_iter = self.nrecord
+                nrecord_eval_mode_this_iter = self.nrecord_eval_mode
+            for j in range(nrecord_this_iter):
                 samples.append(
                     self.agent.sample(
                         self.task_hor, self.policy,
                         os.path.join(iter_dir, "rollout%d.mp4" % j)
                     )
                 )
-            for j in range(self.nrecord_eval_mode):
+
+            for j in range(nrecord_eval_mode_this_iter):
                 self.env.mode = 'eval'
                 eval_samples.append(
                     self.agent.sample(
@@ -154,16 +166,18 @@ class MBExperiment:
                     )
                 )
                 self.env.mode = 'exploration'
-            if self.nrecord > 0:
+            if nrecord_this_iter > 0 or nrecord_eval_mode_this_iter > 0:
                 for item in filter(lambda f: f.endswith(".json"), os.listdir(iter_dir)):
                     os.remove(os.path.join(iter_dir, item))
-            for j in range(max(self.neval, self.nrollouts_per_iter) - self.nrecord):
+            for j in range(
+                    max(self.neval, self.nrollouts_per_iter) - nrecord_this_iter
+            ):
                 samples.append(
                     self.agent.sample(
                         self.task_hor, self.policy
                     )
                 )
-            for j in range(self.neval_eval_mode - self.nrecord_eval_mode):
+            for j in range(self.neval_eval_mode - nrecord_eval_mode_this_iter):
                 self.env.mode = 'eval'
                 eval_samples.append(
                     self.agent.sample(

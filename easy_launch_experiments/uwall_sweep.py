@@ -29,15 +29,18 @@ def exp(variant):
         ctrl_type="MPC",
         ctrl_args=DotMap(),
         overrides=[
+            ["exp_cfg.exp_cfg.nrollouts_per_iter", 50],
             ["exp_cfg.log_cfg.nrecord", 1],
-            ["exp_cfg.log_cfg.neval", 5],
+            ["exp_cfg.log_cfg.record_period", 1],
+            ["exp_cfg.log_cfg.neval", 0],
             ["exp_cfg.log_cfg.nrecord_eval_mode", 1],
-            ["exp_cfg.log_cfg.neval_eval_mode", 3],
+            ["exp_cfg.log_cfg.neval_eval_mode", 1],
+            ["ctrl_cfg.per", 5],
             ["exp_cfg.exp_cfg.ntrain_iters", 500],
             ["ctrl_cfg.opt_cfg.cfg.popsize", "200"],
             ["ctrl_cfg.opt_cfg.cfg.num_elites", "20"],
             ["ctrl_cfg.opt_cfg.cfg.max_iters", "5"],
-            # ["exp_cfg.exp_cfg.ntrain_iters", 2],
+            # ["exp_cfg.exp_cfg.ntrain_iters", 10],
             # ["ctrl_cfg.opt_cfg.cfg.popsize", "2"],
             # ["ctrl_cfg.opt_cfg.cfg.num_elites", "2"],
             # ["ctrl_cfg.opt_cfg.cfg.max_iters", "1"],
@@ -74,9 +77,9 @@ def main():
     mode = 'here_no_doodad'
     exp_prefix = 'dev-time'
 
-    n_seeds = 3
-    mode = 'sss'
-    exp_prefix = 'neurips-rebut-pets-new-uwall-5-steps-sss'
+    # n_seeds = 3
+    # mode = 'sss'
+    # exp_prefix = 'neurips-rebut-pets-new-uwall-5-steps-sss'
 
     search_space = {
         # 'steps_needed_to_solve': [5, 10, 20],
@@ -97,8 +100,10 @@ def main():
                 variant=variant,
                 exp_id=exp_id,
                 snapshot_mode='gap_and_last',
-                snapshot_gap=25,
+                # snapshot_gap=25,
+                snapshot_gap=5,
                 use_gpu=True,
+                time_in_mins=int(2.9*24*60),
             )
 
 if __name__ == "__main__":

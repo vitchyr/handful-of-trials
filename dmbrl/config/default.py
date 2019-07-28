@@ -32,6 +32,7 @@ def create_config(env_name, ctrl_type, ctrl_args, overrides, logdir,
             ),
             log_cfg=DotMap(
                 nrecord=int,
+                record_period=int,
                 neval=int,
                 nrecord_eval_mode=int,
                 neval_eval_mode=int,
