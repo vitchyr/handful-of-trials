@@ -62,7 +62,7 @@ def main():
 
     n_seeds = 5
     # mode = 'sss'
-    exp_prefix = 'local-neurips-rebut-pets-pnr'
+    exp_prefix = 'local-neurips-rebut-pets-pnr-take2'
 
     search_space = {
         "override_params.exp_cfg-exp_cfg-nrollouts_per_iter": [10],
@@ -92,8 +92,7 @@ def main():
                 variant=variant,
                 exp_id=exp_id,
                 snapshot_mode='gap_and_last',
-                # snapshot_gap=25,
-                snapshot_gap=5,
+                snapshot_gap=50,
                 use_gpu=True,
                 time_in_mins=int(2.9*24*60),
             )
