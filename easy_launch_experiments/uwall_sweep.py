@@ -66,7 +66,7 @@ def main():
 
     n_seeds = 3
     mode = 'ec2'
-    exp_prefix = 'ec2-neurips-pets-old-uwall-10-steps-sss-per5'
+    exp_prefix = 'ec2-neurips-pets-old-uwall-sweep-steps-per5'
 
     search_space = {
         # 'steps_needed_to_solve': [5, 10, 20],
@@ -79,9 +79,10 @@ def main():
         # 'steps_needed_to_solve': [5],
         # 'task_horizon_factor': [4],
         # "override_params.exp_cfg-exp_cfg-nrollouts_per_iter": [50],
-        'steps_needed_to_solve': [10],
-        'task_horizon_factor': [4],
-        "override_params.exp_cfg-exp_cfg-nrollouts_per_iter": [25],
+        # 'steps_needed_to_solve': [10],
+        # 'task_horizon_factor': [4],
+        # "override_params.exp_cfg-exp_cfg-nrollouts_per_iter": [25],
+        'steps_needed_to_solve': [5, 10, 40, 80],
         "override_params.exp_cfg-log_cfg-nrecord": [1],
         "override_params.exp_cfg-log_cfg-record_period": [1],
         "override_params.exp_cfg-log_cfg-neval": [0],
@@ -100,6 +101,15 @@ def main():
         ),
     )
     for exp_id, variant in enumerate(sweeper.iterate_hyperparameters()):
+        nsteps = variant['steps_needed_to_solve']
+        if nsteps == 80 or nsteps == 40:
+            variant['task_horizon_factor'] = 1.25
+            variant['override_params']['exp_cfg-exp_cfg-nrollouts_per_iter'] \
+                = int(800. / nsteps)
+        else:
+            variant['task_horizon_factor'] = 4
+            variant['override_params']['exp_cfg-exp_cfg-nrollouts_per_iter'] \
+                = int(250. / nsteps)
         for _ in range(n_seeds):
             run_experiment(
                 exp,
