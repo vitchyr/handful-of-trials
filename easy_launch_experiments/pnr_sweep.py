@@ -60,19 +60,19 @@ def main():
     mode = 'here_no_doodad'
     exp_prefix = 'dev-time'
 
-    n_seeds = 3
-    mode = 'sss'
-    exp_prefix = 'neurips-rebut-pets-pnr'
+    n_seeds = 5
+    # mode = 'sss'
+    exp_prefix = 'local-neurips-rebut-pets-pnr'
 
     search_space = {
-        "override_params.exp_cfg-exp_cfg-nrollouts_per_iter": [50],
+        "override_params.exp_cfg-exp_cfg-nrollouts_per_iter": [10],
         "override_params.exp_cfg-log_cfg-nrecord": [0],
         "override_params.exp_cfg-log_cfg-record_period": [1],
         "override_params.exp_cfg-log_cfg-neval": [0],
         "override_params.exp_cfg-log_cfg-nrecord_eval_mode": [0],
         "override_params.exp_cfg-log_cfg-neval_eval_mode": [0],
         "override_params.ctrl_cfg-per": [5],
-        "override_params.exp_cfg-exp_cfg-ntrain_iters": [500],
+        "override_params.exp_cfg-exp_cfg-ntrain_iters": [2000],
         "override_params.ctrl_cfg-opt_cfg-cfg-popsize": [200],
         "override_params.ctrl_cfg-opt_cfg-cfg-num_elites": [20],
         "override_params.ctrl_cfg-opt_cfg-cfg-max_iters": [5],
