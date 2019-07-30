@@ -6,6 +6,7 @@ From: vitchyr/pets-gpu-mj12
     mkdir -p /global/home/users/vitchyr
     chmod -R 777 /opt
     chmod -R 777 /root
+    chmod -R 777 /usr
     touch /bin/nvidia-smi
     touch /usr/bin/nvidia-smi
     touch /usr/bin/nvidia-debugdump
