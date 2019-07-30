@@ -22,7 +22,7 @@ def exp(variant):
     config_module_kwargs = {
         'steps_needed_to_solve': variant['steps_needed_to_solve'],
         'planning_horizon': variant['steps_needed_to_solve'],
-        'task_horizon_factor': 4,
+        'task_horizon_factor': variant['task_horizon_factor'],
     }
     overrides = []
     for override_key, value in variant['override_params'].items():
@@ -64,14 +64,15 @@ def main():
     mode = 'here_no_doodad'
     exp_prefix = 'dev-time'
 
-    n_seeds = 2
+    n_seeds = 5
     mode = 'sss'
-    exp_prefix = 'neurips-rebut-pets-new-uwall-5-steps-sss-per5'
+    exp_prefix = 'neurips-rebut-pets-new-uwall-100-steps-sss-per5'
 
     search_space = {
         # 'steps_needed_to_solve': [5, 10, 20],
-        'steps_needed_to_solve': [5],
-        "override_params.exp_cfg-exp_cfg-nrollouts_per_iter": [50],
+        'steps_needed_to_solve': [80],
+        'task_horizon_factor': [1.25],
+        "override_params.exp_cfg-exp_cfg-nrollouts_per_iter": [10],
         "override_params.exp_cfg-log_cfg-nrecord": [1],
         "override_params.exp_cfg-log_cfg-record_period": [1],
         "override_params.exp_cfg-log_cfg-neval": [0],
