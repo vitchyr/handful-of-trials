@@ -3,10 +3,11 @@ from __future__ import print_function
 from __future__ import absolute_import
 
 import numpy as np
-from gym.monitoring import VideoRecorder
 from dotmap import DotMap
 
 import time
+
+from dmbrl.monitor import VideoRecorder
 
 
 class Agent:
