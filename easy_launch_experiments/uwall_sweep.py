@@ -64,15 +64,24 @@ def main():
     mode = 'here_no_doodad'
     exp_prefix = 'dev-time'
 
-    n_seeds = 5
-    mode = 'sss'
-    exp_prefix = 'neurips-rebut-pets-new-uwall-100-steps-sss-per5'
+    n_seeds = 3
+    mode = 'ec2'
+    exp_prefix = 'ec2-neurips-pets-old-uwall-10-steps-sss-per5'
 
     search_space = {
         # 'steps_needed_to_solve': [5, 10, 20],
-        'steps_needed_to_solve': [80],
-        'task_horizon_factor': [1.25],
-        "override_params.exp_cfg-exp_cfg-nrollouts_per_iter": [10],
+        # 'steps_needed_to_solve': [80],
+        # 'task_horizon_factor': [1.25],
+        # "override_params.exp_cfg-exp_cfg-nrollouts_per_iter": [10],
+        # 'steps_needed_to_solve': [40],
+        # 'task_horizon_factor': [1.25],
+        # "override_params.exp_cfg-exp_cfg-nrollouts_per_iter": [20],
+        # 'steps_needed_to_solve': [5],
+        # 'task_horizon_factor': [4],
+        # "override_params.exp_cfg-exp_cfg-nrollouts_per_iter": [50],
+        'steps_needed_to_solve': [10],
+        'task_horizon_factor': [4],
+        "override_params.exp_cfg-exp_cfg-nrollouts_per_iter": [25],
         "override_params.exp_cfg-log_cfg-nrecord": [1],
         "override_params.exp_cfg-log_cfg-record_period": [1],
         "override_params.exp_cfg-log_cfg-neval": [0],
@@ -99,8 +108,7 @@ def main():
                 variant=variant,
                 exp_id=exp_id,
                 snapshot_mode='gap_and_last',
-                # snapshot_gap=25,
-                snapshot_gap=5,
+                snapshot_gap=25,
                 use_gpu=True,
                 time_in_mins=int(2.9*24*60),
             )
