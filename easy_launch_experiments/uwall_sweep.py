@@ -64,9 +64,9 @@ def main():
     mode = 'here_no_doodad'
     exp_prefix = 'dev-time'
 
-    n_seeds = 3
+    n_seeds = 2
     mode = 'sss'
-    exp_prefix = 'neurips-rebut-pets-new-uwall-5-steps-sss-per1'
+    exp_prefix = 'neurips-rebut-pets-new-uwall-5-steps-sss-per5'
 
     search_space = {
         # 'steps_needed_to_solve': [5, 10, 20],
@@ -77,7 +77,7 @@ def main():
         "override_params.exp_cfg-log_cfg-neval": [0],
         "override_params.exp_cfg-log_cfg-nrecord_eval_mode": [1],
         "override_params.exp_cfg-log_cfg-neval_eval_mode": [1],
-        "override_params.ctrl_cfg-per": [1],
+        "override_params.ctrl_cfg-per": [5],
         "override_params.exp_cfg-exp_cfg-ntrain_iters": [500],
         "override_params.ctrl_cfg-opt_cfg-cfg-popsize": [200],
         "override_params.ctrl_cfg-opt_cfg-cfg-num_elites": [20],
