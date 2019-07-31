@@ -17,6 +17,8 @@ from dmbrl.misc.MBExp import MBExperiment
 
 def exp(variant):
     from easy_logger import logger
+    import os
+    os.environ["CUDA_VISIBLE_DEVICES"]="2"
 
     tf.reset_default_graph()
     config_module_kwargs = {}
@@ -60,9 +62,9 @@ def main():
     mode = 'here_no_doodad'
     exp_prefix = 'dev-time'
 
-    n_seeds = 5
+    n_seeds = 1
     # mode = 'sss'
-    exp_prefix = 'local-neurips-rebut-pets-pnr-take2'
+    exp_prefix = 'deepthought-neur-rebut-pets-pnr-take3'
 
     search_space = {
         "override_params.exp_cfg-exp_cfg-nrollouts_per_iter": [10],
