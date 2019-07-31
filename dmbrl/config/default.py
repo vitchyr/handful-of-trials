@@ -41,6 +41,7 @@ def create_config(env_name, ctrl_type, ctrl_args, overrides, logdir,
         ),
         ctrl_cfg=DotMap(
             per=int,
+            max_num_data=int,
             prop_cfg=DotMap(
                 model_pretrained=make_bool,
                 npart=int,

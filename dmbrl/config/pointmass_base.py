@@ -29,7 +29,10 @@ class PointmassBaseConfigModule(object):
         )
         cfg.gpu_options.allow_growth = True
         self.SESS = tf.Session(config=cfg)
-        self.NN_TRAIN_CFG = {"epochs": 5}
+        self.NN_TRAIN_CFG = {
+            "epochs": 1,
+            "max_num_batches_total": 200,
+        }
         self.OPT_CFG = {
             "Random": {
                 "popsize": 10

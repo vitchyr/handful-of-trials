@@ -109,6 +109,7 @@ class MPC(Controller):
         self.save_all_models = params.log_cfg.get("save_all_models", False)
         self.log_traj_preds = params.log_cfg.get("log_traj_preds", False)
         self.log_particles = params.log_cfg.get("log_particles", False)
+        self.max_num_data = params.get("max_num_data", 1000)
 
         # Perform argument checks
         if self.prop_mode not in ["E", "DS", "MM", "TS1", "TSinf"]:
@@ -186,6 +187,10 @@ class MPC(Controller):
             new_train_targs.append(self.targ_proc(obs[:-1], obs[1:]))
         self.train_in = np.concatenate([self.train_in] + new_train_in, axis=0)
         self.train_targs = np.concatenate([self.train_targs] + new_train_targs, axis=0)
+
+        start_idx = max(0, len(self.train_in) - self.max_num_data)
+        self.train_in = self.train_in[start_idx:, :]
+        self.train_targs = self.train_targs[start_idx:, :]
 
         # Train the model
         self.model.train(self.train_in, self.train_targs, **self.model_train_cfg)

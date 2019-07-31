@@ -76,6 +76,7 @@ def main():
         "override_params.ctrl_cfg-opt_cfg-cfg-popsize": [200],
         "override_params.ctrl_cfg-opt_cfg-cfg-num_elites": [20],
         "override_params.ctrl_cfg-opt_cfg-cfg-max_iters": [5],
+        "override_params.ctrl_cfg-max_num_data": [100000],
     }
     sweeper = hyp.DeterministicHyperparameterSweeper(
         search_space,

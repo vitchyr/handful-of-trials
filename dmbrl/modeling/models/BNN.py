@@ -219,6 +219,7 @@ class BNN:
 
     def train(self, inputs, targets,
               batch_size=32, epochs=100,
+              max_num_batches_total=10000,
               hide_progress=False, holdout_ratio=0.0, max_logging=5000):
         """Trains/Continues network training
 
@@ -252,6 +253,7 @@ class BNN:
             epoch_range = range(epochs)
         else:
             epoch_range = trange(epochs, unit="epoch(s)", desc="Network training")
+        num_batches_total = 0
         for _ in epoch_range:
             for batch_num in range(int(np.ceil(idxs.shape[-1] / batch_size))):
                 batch_idxs = idxs[:, batch_num * batch_size:(batch_num + 1) * batch_size]
@@ -259,6 +261,10 @@ class BNN:
                     self.train_op,
                     feed_dict={self.sy_train_in: inputs[batch_idxs], self.sy_train_targ: targets[batch_idxs]}
                 )
+                num_batches_total += 1
+                if num_batches_total > max_num_batches_total:
+                    print("STOP numbt", num_batches_total)
+                    return
             idxs = shuffle_rows(idxs)
             if not hide_progress:
                 if holdout_ratio < 1e-12:
@@ -288,6 +294,7 @@ class BNN:
                             }
                         )
                     })
+        print("numbt", num_batches_total)
 
     def predict(self, inputs, factored=False, *args, **kwargs):
         """Returns the distribution predicted by the model for each input vector in inputs.
