@@ -19,16 +19,12 @@ def exp(variant):
     from easy_logger import logger
 
     tf.reset_default_graph()
-    config_module_kwargs = {
-        'steps_needed_to_solve': variant['steps_needed_to_solve'],
-        'planning_horizon': variant['steps_needed_to_solve'],
-        'task_horizon_factor': 4,
-    }
+    config_module_kwargs = {}
     overrides = []
     for override_key, value in variant['override_params'].items():
         overrides.append([override_key.replace('-', '.'), value])
     cfg = create_config(
-        env_name="pointmass_u_wall",
+        env_name=variant['env_name'],
         ctrl_type="MPC",
         ctrl_args=DotMap(),
         overrides=overrides,
@@ -64,30 +60,31 @@ def main():
     mode = 'here_no_doodad'
     exp_prefix = 'dev-time'
 
-    n_seeds = 2
-    mode = 'sss'
-    exp_prefix = 'ec2-neurips-rebut-pets-new-uwall-5-steps-sss-per5'
+    # n_seeds = 5
+    # mode = 'sss'
+    # exp_prefix = 'local-neurips-rebut-pets-pnr-take2'
 
     search_space = {
-        # 'steps_needed_to_solve': [5, 10, 20],
-        'steps_needed_to_solve': [5],
-        "override_params.exp_cfg-exp_cfg-nrollouts_per_iter": [50],
-        # "override_params.exp_cfg-exp_cfg-nrollouts_per_iter": [6],
-        "override_params.exp_cfg-log_cfg-nrecord": [1],
+        "env_name": [
+            # "sawyer_pnp1",
+            "sawyer_pnp2",
+        ],
+        "override_params.exp_cfg-exp_cfg-nrollouts_per_iter": [10],
+        "override_params.exp_cfg-log_cfg-nrecord": [0],
         "override_params.exp_cfg-log_cfg-record_period": [1],
         "override_params.exp_cfg-log_cfg-neval": [0],
-        "override_params.exp_cfg-log_cfg-nrecord_eval_mode": [1],
-        "override_params.exp_cfg-log_cfg-neval_eval_mode": [1],
+        "override_params.exp_cfg-log_cfg-nrecord_eval_mode": [0],
+        "override_params.exp_cfg-log_cfg-neval_eval_mode": [0],
         "override_params.ctrl_cfg-per": [5],
+        "override_params.exp_cfg-exp_cfg-ntrain_iters": [2000],
+        "override_params.ctrl_cfg-opt_cfg-cfg-popsize": [200],
+        "override_params.ctrl_cfg-opt_cfg-cfg-num_elites": [20],
+        "override_params.ctrl_cfg-opt_cfg-cfg-max_iters": [5],
+        # "override_params.exp_cfg-exp_cfg-ntrain_iters": [2000],
+        # "override_params.ctrl_cfg-opt_cfg-cfg-popsize": [3],
+        # "override_params.ctrl_cfg-opt_cfg-cfg-num_elites": [2],
+        # "override_params.ctrl_cfg-opt_cfg-cfg-max_iters": [1],
         "override_params.ctrl_cfg-max_num_data": [100000],
-        # "override_params.exp_cfg-exp_cfg-ntrain_iters": [500],
-        # "override_params.ctrl_cfg-opt_cfg-cfg-popsize": [200],
-        # "override_params.ctrl_cfg-opt_cfg-cfg-num_elites": [20],
-        # "override_params.ctrl_cfg-opt_cfg-cfg-max_iters": [5],
-        "override_params.exp_cfg-exp_cfg-ntrain_iters": [20],
-        "override_params.ctrl_cfg-opt_cfg-cfg-popsize": [5],
-        "override_params.ctrl_cfg-opt_cfg-cfg-num_elites": [2],
-        "override_params.ctrl_cfg-opt_cfg-cfg-max_iters": [1],
     }
     sweeper = hyp.DeterministicHyperparameterSweeper(
         search_space,
@@ -104,8 +101,7 @@ def main():
                 variant=variant,
                 exp_id=exp_id,
                 snapshot_mode='gap_and_last',
-                # snapshot_gap=25,
-                snapshot_gap=5,
+                snapshot_gap=50,
                 use_gpu=True,
                 time_in_mins=int(2.9*24*60),
             )
