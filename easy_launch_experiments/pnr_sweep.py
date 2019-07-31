@@ -60,9 +60,9 @@ def main():
     mode = 'here_no_doodad'
     exp_prefix = 'dev-time'
 
-    n_seeds = 5
+    # n_seeds = 5
     # mode = 'sss'
-    exp_prefix = 'local-neurips-rebut-pets-pnr-take2'
+    # exp_prefix = 'local-neurips-rebut-pets-pnr-take2'
 
     search_space = {
         "override_params.exp_cfg-exp_cfg-nrollouts_per_iter": [10],
