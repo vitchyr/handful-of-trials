@@ -119,8 +119,6 @@ class MBExperiment:
             traj_acs.append(samples[-1]["ac"])
             traj_rews.append(samples[-1]["rewards"])
 
-        eval_traj_obs, eval_traj_acs, eval_traj_rets, eval_traj_rews = [], [], [], []
-
         if self.ninit_rollouts > 0:
             self.policy.train(
                 [sample["obs"] for sample in samples],
@@ -139,6 +137,8 @@ class MBExperiment:
 
             samples = []
             eval_samples = []
+            traj_obs, traj_acs, traj_rets, traj_rews = [], [], [], []
+            eval_traj_obs, eval_traj_acs, eval_traj_rets, eval_traj_rews = [], [], [], []
             if self.record_period > 1:
                 if i % self.record_period == 0:
                     nrecord_this_iter = 1
@@ -219,7 +219,10 @@ class MBExperiment:
                 "eval returns": eval_traj_rets,
                 "eval rewards": eval_traj_rews
             }
-            savemat(os.path.join(self.logdir, "logs.mat"), stats_to_save)
+            if i % logger.get_snapshot_gap() == 0:
+                savemat(os.path.join(
+                    self.logdir, "iter{}_logs.mat".format(i)
+                ), stats_to_save)
             stats_to_log = OrderedDict()
             if len(samples):
                 append_log(
