@@ -189,8 +189,9 @@ class MPC(Controller):
         self.train_targs = np.concatenate([self.train_targs] + new_train_targs, axis=0)
 
         start_idx = max(0, len(self.train_in) - self.max_num_data)
-        self.train_in = self.train_in[start_idx:, :]
-        self.train_targs = self.train_targs[start_idx:, :]
+        if start_idx > 0:
+            self.train_in = self.train_in[start_idx:, :]
+            self.train_targs = self.train_targs[start_idx:, :]
 
         # Train the model
         self.model.train(self.train_in, self.train_targs, **self.model_train_cfg)
