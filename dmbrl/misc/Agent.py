@@ -7,7 +7,10 @@ from dotmap import DotMap
 
 import time
 
-from dmbrl.monitor import VideoRecorder
+try:
+    from gym.monitoring import VideoRecorder
+except ImportError:
+    from dmbrl.monitor import VideoRecorder
 
 
 class Agent:
