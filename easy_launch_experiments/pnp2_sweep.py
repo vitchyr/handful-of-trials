@@ -18,7 +18,7 @@ from dmbrl.misc.MBExp import MBExperiment
 def exp(variant):
     from easy_logger import logger
     import os
-    os.environ["CUDA_VISIBLE_DEVICES"]="2"
+    os.environ["CUDA_VISIBLE_DEVICES"]="1"
 
     tf.reset_default_graph()
     config_module_kwargs = {}
@@ -64,11 +64,11 @@ def main():
 
     n_seeds = 1
     # mode = 'sss'
-    exp_prefix = 'deepthought-neur-rebut-pets-pnp1'
+    exp_prefix = 'deepthought-neur-rebut-pets-pnp2'
 
     search_space = {
         "env_name": [
-            "sawyer_pnp1",
+            "sawyer_pnp2",
         ],
         "override_params.exp_cfg-exp_cfg-nrollouts_per_iter": [10],
         "override_params.exp_cfg-log_cfg-nrecord": [0],
